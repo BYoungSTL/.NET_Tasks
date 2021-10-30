@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Login Name="Fuf">
+  <Windows>
+    <Window Title="title1">
+      <top>0</top>
+      <width>10</width>
+      <left>10</left>
+      <height>10</height>
+    </Window>
+    <Window Title="main">
+      <top>15</top>
+      <width>15</width>
+      <left>15</left>
+      <height>15</height>
+    </Window>
+  </Windows>
+</Login>
