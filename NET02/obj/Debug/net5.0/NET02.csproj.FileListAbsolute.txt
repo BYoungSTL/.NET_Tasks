@@ -1,0 +1,16 @@
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\bin\Debug\net5.0\NET02.exe
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\bin\Debug\net5.0\NET02.deps.json
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\bin\Debug\net5.0\NET02.runtimeconfig.json
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\bin\Debug\net5.0\NET02.runtimeconfig.dev.json
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\bin\Debug\net5.0\NET02.dll
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\bin\Debug\net5.0\ref\NET02.dll
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\bin\Debug\net5.0\NET02.pdb
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\obj\Debug\net5.0\NET02.csproj.AssemblyReference.cache
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\obj\Debug\net5.0\NET02.GeneratedMSBuildEditorConfig.editorconfig
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\obj\Debug\net5.0\NET02.AssemblyInfoInputs.cache
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\obj\Debug\net5.0\NET02.AssemblyInfo.cs
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\obj\Debug\net5.0\NET02.csproj.CoreCompileInputs.cache
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\obj\Debug\net5.0\NET02.dll
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\obj\Debug\net5.0\ref\NET02.dll
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\obj\Debug\net5.0\NET02.pdb
+D:\RiderProjects\NET Tasks\NET02\NET02\NET02\obj\Debug\net5.0\NET02.genruntimeconfig.cache
