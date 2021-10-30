@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>NET01</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Update="Entities\TextMaterial.cs">
+        <DependentUpon>TrainingMaterials.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Entities\ReferenceMaterial.cs">
+        <DependentUpon>TrainingMaterials.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Entities\VideoMaterial.cs">
+        <DependentUpon>TrainingMaterials.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+</Project>
