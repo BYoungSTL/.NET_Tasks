@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "dgSpecHash": "Q3WNX7DkXYSYj/SY3+CBmYPU7N3wtr1mbK2MH6ptQTfpgPyQa98I3ownPVYhQh/jYTdm/NbqwG5GxEXpOTTzSQ==",
+  "success": true,
+  "projectFilePath": "D:\\NET Tasks\\.NET_Tasks\\Logging\\Logging\\Logging.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\documentformat.openxml\\2.14.0\\documentformat.openxml.2.14.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.configuration\\5.0.0\\microsoft.extensions.configuration.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\5.0.0\\microsoft.extensions.configuration.abstractions.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.configuration.fileextensions\\5.0.0\\microsoft.extensions.configuration.fileextensions.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.configuration.json\\5.0.0\\microsoft.extensions.configuration.json.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\5.0.0\\microsoft.extensions.dependencyinjection.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\5.0.0\\microsoft.extensions.dependencyinjection.abstractions.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.fileproviders.abstractions\\5.0.0\\microsoft.extensions.fileproviders.abstractions.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.fileproviders.physical\\5.0.0\\microsoft.extensions.fileproviders.physical.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.filesystemglobbing\\5.0.0\\microsoft.extensions.filesystemglobbing.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.logging\\5.0.0\\microsoft.extensions.logging.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\5.0.0\\microsoft.extensions.logging.abstractions.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.options\\5.0.0\\microsoft.extensions.options.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.extensions.primitives\\5.0.0\\microsoft.extensions.primitives.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.1\\microsoft.netcore.platforms.5.0.1.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\microsoft.win32.registry\\5.0.0\\microsoft.win32.registry.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\nlog\\4.7.12\\nlog.4.7.12.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\nlog.config\\4.7.12\\nlog.config.4.7.12.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\nlog.schema\\4.7.12\\nlog.schema.4.7.12.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\system.diagnostics.eventlog\\5.0.1\\system.diagnostics.eventlog.5.0.1.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\system.io.packaging\\4.7.0\\system.io.packaging.4.7.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\system.security.accesscontrol\\5.0.0\\system.security.accesscontrol.5.0.0.nupkg.sha512",
+    "C:\\Users\\maksimoleynik\\.nuget\\packages\\system.security.principal.windows\\5.0.0\\system.security.principal.windows.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
