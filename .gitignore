@@ -80,3 +80,7 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/rider
 Logging/Logging/bin/Debug/net5.0/logs/word/~$-11-03.docx
+
+AsyncMonitoring/
+
+Logging/ListenerInterfaces/obj/rider.project.restore.info
