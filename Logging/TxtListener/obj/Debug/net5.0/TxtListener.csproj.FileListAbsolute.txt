@@ -13,3 +13,4 @@ D:\NET Tasks\.NET_Tasks\Logging\TxtListener\obj\Debug\net5.0\TxtListener.csproj.
 D:\NET Tasks\.NET_Tasks\Logging\TxtListener\obj\Debug\net5.0\TxtListener.dll
 D:\NET Tasks\.NET_Tasks\Logging\TxtListener\obj\Debug\net5.0\ref\TxtListener.dll
 D:\NET Tasks\.NET_Tasks\Logging\TxtListener\obj\Debug\net5.0\TxtListener.pdb
+D:\NET Tasks\.NET_Tasks\Logging\TxtListener\obj\Debug\net5.0\TxtListener.csproj.CopyComplete

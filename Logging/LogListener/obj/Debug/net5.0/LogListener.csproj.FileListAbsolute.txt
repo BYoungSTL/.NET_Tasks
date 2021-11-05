@@ -13,3 +13,4 @@ D:\NET Tasks\.NET_Tasks\Logging\LogListener\obj\Debug\net5.0\LogListener.csproj.
 D:\NET Tasks\.NET_Tasks\Logging\LogListener\obj\Debug\net5.0\LogListener.dll
 D:\NET Tasks\.NET_Tasks\Logging\LogListener\obj\Debug\net5.0\ref\LogListener.dll
 D:\NET Tasks\.NET_Tasks\Logging\LogListener\obj\Debug\net5.0\LogListener.pdb
+D:\NET Tasks\.NET_Tasks\Logging\LogListener\obj\Debug\net5.0\LogListener.csproj.CopyComplete

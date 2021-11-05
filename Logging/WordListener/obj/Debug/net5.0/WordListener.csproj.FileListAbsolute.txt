@@ -13,3 +13,4 @@ D:\NET Tasks\.NET_Tasks\Logging\WordListener\obj\Debug\net5.0\WordListener.cspro
 D:\NET Tasks\.NET_Tasks\Logging\WordListener\obj\Debug\net5.0\WordListener.dll
 D:\NET Tasks\.NET_Tasks\Logging\WordListener\obj\Debug\net5.0\ref\WordListener.dll
 D:\NET Tasks\.NET_Tasks\Logging\WordListener\obj\Debug\net5.0\WordListener.pdb
+D:\NET Tasks\.NET_Tasks\Logging\WordListener\obj\Debug\net5.0\WordListener.csproj.CopyComplete
