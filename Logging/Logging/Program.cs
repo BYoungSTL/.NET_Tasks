@@ -1,4 +1,5 @@
 ﻿using Logging.Entities;
+using LogListener;
 
 namespace Logging
 {
@@ -27,7 +28,7 @@ namespace Logging
             {
                 Name = "AA", Age = 19
             };
-            Tracking<Student>.Track(student);
+            //Tracking<Student>.Track(student);
         }
     }
 }

@@ -16,14 +16,17 @@ namespace Logging
         private static readonly string LogName = Configuration["AssemblyLogName"];
         private static readonly string TxtName = Configuration["AssemblyTxtName"];
         private static readonly string WordName = Configuration["AssemblyWordName"];
+        private const string Txt = "TxtListener.TextListener";
+        private const string Log = "LogListener.EventLogListener";
+        private const string Word = "WordListener.DocxListener";
+
         public static Type LoadTxtListener()
         {
             Type typeTextListener;
             try
             {
                 Assembly assemblyTxt = Assembly.Load(new AssemblyName(TxtName));
-
-                typeTextListener = assemblyTxt.GetType("TxtListener.TextListener", true, true);
+                typeTextListener = assemblyTxt.GetType(Txt, true, true);
             }
             catch
             {
@@ -39,7 +42,7 @@ namespace Logging
             try
             {
                 Assembly assemblyLog = Assembly.Load(new AssemblyName(LogName));
-                typeLogListener = assemblyLog.GetType("LogListener.EventLogListener", true, true);
+                typeLogListener = assemblyLog.GetType(Log, true, true);
             }
             catch
             {
@@ -54,7 +57,7 @@ namespace Logging
             try
             {
                 Assembly assemblyWord = Assembly.Load(new AssemblyName(WordName));
-                typeWordListener = assemblyWord.GetType("WordListener.DocxListener", true, true);
+                typeWordListener = assemblyWord.GetType(Word, true, true);
             }
             catch
             {

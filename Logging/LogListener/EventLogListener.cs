@@ -26,12 +26,14 @@ namespace LogListener
         private string _loggerNamePattern;
         private string _path;
         private string _writeString = $"{DateTime.Now}, {Assembly.GetExecutingAssembly().Location} ";
+        private const string SecondLayout = "${longdate} ${uppercase:${level}} ${message} ${newline}";
+        private const string FirstLayout = "${longdate} ${callsite} ${uppercase:${level}} ${message} ${newline}";
 
         public ListenerType Type { get; set; }
 
         public Logger _Logger { get; set; }
 
-        public void Listener(NLog.LogLevel logLevel, string message)
+        public void Listener(LogLevel logLevel, string message)
         {
             _Logger = LogManager.GetLogger(Type.ToString().ToLower());
             if (!SourceExists("log"))
@@ -72,7 +74,7 @@ namespace LogListener
                 FileName = _path,
                 Name = Type.ToString().ToLower()
             };
-            configuration.LoggingRules.Add(new LoggingRule(Type.ToString().ToLower(), NLog.LogLevel.Trace, logfile));
+            configuration.LoggingRules.Add(new LoggingRule(Type.ToString().ToLower(), LogLevel.Trace, logfile));
             LogManager.Configuration = configuration;
         }
 
@@ -101,39 +103,38 @@ namespace LogListener
                 FileName = _path,
                 Name = _loggerNamePattern
             };
-            configuration.LoggingRules.Add(new LoggingRule(_loggerNamePattern, NLog.LogLevel.Trace, logfile));
+            configuration.LoggingRules.Add(new LoggingRule(_loggerNamePattern, LogLevel.Trace, logfile));
             LogManager.Configuration = configuration;
             
             Console.WriteLine("Enter Logging Level (debug, info, error, fatal, warn, trace)");
             Console.WriteLine("If input is invalid: Logging level = trace");
             string level = Console.ReadLine() ?? string.Empty;
             
-            NLog.LogLevel logLevel;
+            LogLevel logLevel;
             switch (level.ToLower())
             {
                 case "debug":
-                    logLevel = NLog.LogLevel.Debug;
+                    logLevel = LogLevel.Debug;
                     break;
                 case "info":
                 case "information":
-                    logLevel = NLog.LogLevel.Info;
+                    logLevel = LogLevel.Info;
                     break;
                 case "error":
-                    logLevel = NLog.LogLevel.Error;
+                    logLevel = LogLevel.Error;
                     break;
                 case "fatal":
-                    logLevel = NLog.LogLevel.Fatal;
+                    logLevel = LogLevel.Fatal;
                     break;
                 case "warning":
                 case "warn":
-                    logLevel = NLog.LogLevel.Warn;
+                    logLevel = LogLevel.Warn;
                     break;
                 default:
-                    logLevel = NLog.LogLevel.Trace;
+                    logLevel = LogLevel.Trace;
                     break;
             }
 
-            
             Console.WriteLine("Choose format layout");
             Console.WriteLine("1) Date, callsite, logging level, message");
             Console.WriteLine("2) Date, logging level, message");
@@ -142,11 +143,11 @@ namespace LogListener
             {
                 case 2:
                     logfile.Layout = new SimpleLayout
-                        {Text = "${longdate} ${callsite} ${uppercase:${level}} ${message} ${newline}"};
+                        {Text = SecondLayout};
                     break;
                 default:
                     logfile.Layout = new SimpleLayout
-                        {Text = "${longdate} ${uppercase:${level}} ${message} ${newline}"};
+                        {Text = FirstLayout};
                     break;
             }
             configuration.LoggingRules.Add(new LoggingRule(_loggerNamePattern, logLevel, logfile));

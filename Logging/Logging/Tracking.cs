@@ -15,13 +15,12 @@ namespace Logging
         /// <param name="obj"></param>
         public static void Track(T obj)
         {
-
             Type typeTextListener = LoggerLoad.LoadTxtListener();
             Type typeLogListener = LoggerLoad.LoadLogListener();
             Type typeWordListener = LoggerLoad.LoadWordListener();
             
-            Type type = typeof(T);
-            var attributes = type.CustomAttributes;
+            Type entityType = typeof(T);
+            var attributes = entityType.CustomAttributes;
             
             //Gets methods from loadable assemblies
             object textListener = Activator.CreateInstance(typeTextListener);
@@ -47,7 +46,7 @@ namespace Logging
             //Checks TrackingProperty
             if (isTrackingEntity)
             {
-                var properties = type.GetProperties();
+                var properties = entityType.GetProperties();
                 foreach (var property in properties)
                 {
                     var attrs = property.CustomAttributes;

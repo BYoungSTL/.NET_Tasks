@@ -25,7 +25,7 @@ namespace WordListener
 
         public Logger _Logger { get; set; }
 
-        public void Listener(NLog.LogLevel logLevel, string message)
+        public void Listener(LogLevel logLevel, string message)
         {
             string docText = null;
             if (File.Exists(_tempFile))
@@ -44,6 +44,7 @@ namespace WordListener
             
             MainDocumentPart mainPart = word.AddMainDocumentPart();
             mainPart.Document = new Document();
+            
             Body body = mainPart.Document.AppendChild(new Body());
 
             Paragraph paragraph = body.AppendChild(new Paragraph());
@@ -64,11 +65,9 @@ namespace WordListener
             run.AppendChild(new Paragraph());
             
             //Creating txt file for addition docx file
-            using (FileStream fileStream = new FileStream(_tempFile, FileMode.OpenOrCreate))
-            {
-                byte[] array = Encoding.Default.GetBytes(newString.ToString());
-                fileStream.Write(array, 0 , array.Length);
-            }
+            using FileStream fileStream = new FileStream(_tempFile, FileMode.OpenOrCreate);
+            byte[] array = Encoding.Default.GetBytes(newString.ToString());
+            fileStream.Write(array, 0 , array.Length);
         }
 
         public void DefaultLoggerOptions()
@@ -96,8 +95,8 @@ namespace WordListener
             }
 
             Console.WriteLine("Choose format of log:");
-            Console.WriteLine("1) Date, Location, Logging Level,message");
-            Console.WriteLine("2) Date, Logging Level,message");
+            Console.WriteLine("1) Date, Location, Logging Level, message");
+            Console.WriteLine("2) Date, Logging Level, message");
 
             int numberFormat = int.Parse(Console.ReadLine() ?? string.Empty);
             switch (numberFormat)
