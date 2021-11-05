@@ -28,7 +28,7 @@ namespace Logging
             {
                 Name = "AA", Age = 19
             };
-            //Tracking<Student>.Track(student);
+            Tracking<Student>.Track(student);
         }
     }
 }

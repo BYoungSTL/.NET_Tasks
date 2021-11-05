@@ -25,7 +25,7 @@ namespace LogListener
     {
         private string _loggerNamePattern;
         private string _path;
-        private string _writeString = $"{DateTime.Now}, {Assembly.GetExecutingAssembly().Location} ";
+        private readonly string _writeString = $"{DateTime.Now}, {Assembly.GetExecutingAssembly().Location} ";
         private const string SecondLayout = "${longdate} ${uppercase:${level}} ${message} ${newline}";
         private const string FirstLayout = "${longdate} ${callsite} ${uppercase:${level}} ${message} ${newline}";
 

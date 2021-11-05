@@ -18,7 +18,7 @@ namespace WordListener
     /// </summary>
     public class DocxListener : IListener
     {
-        private string _tempFile = Directory.GetCurrentDirectory() + $"\\logs\\word\\{DateTime.Now:yy-MM-dd}.txt";
+        private readonly string _tempFile = Directory.GetCurrentDirectory() + $"\\logs\\word\\{DateTime.Now:yy-MM-dd}.txt";
         private string _path;
         private StringBuilder _writeString;
         public ListenerType Type { get; set; }
