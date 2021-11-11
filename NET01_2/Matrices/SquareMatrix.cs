@@ -9,11 +9,12 @@ namespace NET01_2.Matrices
     /// Sizes(Rank) of matrices are equal
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class SquareMatrix<T> : ICloneable
+    public class SquareMatrix<T>
     {
         //Event for track matrix change
+        private delegate void MatrixHandler(string message);
         private event MatrixHandler Notify;
-        
+
         protected int Rank;
         protected T[] Matrix;
 
@@ -28,6 +29,16 @@ namespace NET01_2.Matrices
             Matrix = new T[rank * rank];
         }
 
+        protected SquareMatrix(int rank, bool flag)
+        {
+            if (rank < 0)
+            {
+                throw new ArgumentException("Invalid size of matrix");
+            }
+
+            Rank = rank;
+        }
+
         /* Indexer of Square Matrix:
              - all matrix keeps as a single array
              _matrix[_size * j + i] == _matrix[i,j] */
@@ -35,37 +46,15 @@ namespace NET01_2.Matrices
         {
             get
             {
-                if (i > Rank || j > Rank || i < 0 || j < 0)
-                {
-                    throw new ArgumentException("Invalid index");
-                }
-
+                IndexCheck(i, j);
                 return Matrix[Rank * j + i];
             }
             set
             {
-                if (i > Rank || j > Rank || i < 0 || j < 0)
-                {
-                    throw new ArgumentException("Invalid index");
-                }
-
+                IndexCheck(i, j);
+                MatrixChange(value, i, j);
                 Matrix[Rank * j + i] = value;
             }
-        }
-        
-        /* deep clone, Matrix[i].Copy() it is the extension method to Generic copying*/
-        public virtual object Clone()
-        {
-            T[] newMatrix = new T[Rank * Rank];
-            for (int i = 0; i < Rank * Rank; i++)
-            {
-                newMatrix[i] = Matrix[i].Copy();
-            }
-            return new SquareMatrix<T>(Rank)
-            {
-                Matrix = newMatrix,
-                Rank = Rank
-            };
         }
 
         public override string ToString()
@@ -75,7 +64,7 @@ namespace NET01_2.Matrices
             {
                 for (int j = 0; j < Rank; j++)
                 {
-                    matrixString.Append(this[i,j] + " ");
+                    matrixString.Append(this[i, j] + " ");
                 }
 
                 matrixString.Append('\n');
@@ -84,22 +73,20 @@ namespace NET01_2.Matrices
             return matrixString.ToString();
         }
 
-        public virtual void MatrixChange(SquareMatrix<T> newDiagonalMatrix)
+        protected virtual void MatrixChange(T value, int i, int j)
         {
             Notify += Console.WriteLine;
-            for (int i = 0; i < Rank; i++)
+            if (!value.Equals(this[i, j]))
             {
-                for (int j = 0; j < Rank; j++)
-                {
-                    if (this[i, j] == null)
-                    {
-                        continue;
-                    }
-                    if (!this[i,j].Equals(newDiagonalMatrix[i,j]))
-                    {
-                        Notify?.Invoke($"Changed: square matrix, {i}, {j}");
-                    }
-                }
+                Notify?.Invoke($"Changed: square matrix, {i}, {j}");
+            }
+        }
+
+        protected void IndexCheck(int i, int j)
+        {
+            if (i >= Rank || j >= Rank || i < 0 || j < 0)
+            {
+                throw new ArgumentException("Invalid index");
             }
         }
     }
