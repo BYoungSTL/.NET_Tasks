@@ -1,9 +1,0 @@
-{
-  "Sensor": {
-    "Type": "temperature",
-    "Interval": 200,
-    "Mode": "simple",
-    "MeasuredName": "temperature",
-    "MeasuredValue": "Celsius" 
-  }
-}

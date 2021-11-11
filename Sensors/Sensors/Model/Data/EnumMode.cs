@@ -1,7 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-
-namespace Sensors.Sensors
+namespace Sensors.Model.Data
 {
     [DataContract]
     public enum EnumMode
