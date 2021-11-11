@@ -26,11 +26,6 @@ namespace NET02.Entities
         {
             get
             {
-                if (!Books.Contains(new Book(isbnCode)))
-                {
-                    return null;
-                }
-                
                 return Books.FirstOrDefault(b => b.ISBNCode.Equals(Book.ISBNCodeСoercion(isbnCode)));
             }
         }
@@ -52,13 +47,7 @@ namespace NET02.Entities
         /// <returns></returns>
         public IEnumerable GetAuthorBooks()
         {
-            var selected = Books.SelectMany(b => b.Authors).GroupBy(x=>x.FirstName).Select(x => new {Name = x.Key, Count = x.Count()});
-            foreach (var v in selected)
-            {
-                Console.WriteLine($"{v.Name} : {v.Count}");
-            }
-
-            return selected;
+            return Books.SelectMany(b => b.Authors).GroupBy(x=>x.FirstName).Select(x => new {Name = x.Key, Count = x.Count()}).ToList();
         }
     }
 }
