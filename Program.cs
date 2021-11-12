@@ -1,13 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using NET02._2.Entities;
+using NET02._2.Serializers;
 
 namespace NET02._2
 {
     class Program
     {
+        
+        private static async Task Operations(List<Login> logins)
+        {
+            SerializeJson<Login> serializeJson = new SerializeJson<Login>();
+            SerializeXml<Login> serializeXml = new SerializeXml<Login>();
+            
+            await serializeJson.Serialize(logins);
+            logins = await serializeJson.Deserialize();
+            
+            await serializeXml.Serialize(logins);
+            logins = await serializeXml.Deserialize();
+            XmlSplitter.XmlSplitting();
+            
+            if (logins != null)
+                await serializeJson.Serialize(logins);
+        }
+        
         static void Main(string[] args)
         {
+            
             Window first = new Window
             {
                 Height = 10,
@@ -43,33 +62,29 @@ namespace NET02._2
                 Windows = new List<Window>{first, third}
             };
             List<Login> logins = new List<Login> {login1, login2};
-            Serializer.XmlSerialize(logins);
-            logins = Serializer.XmlDeserialize();
-            if (logins != null)
-            {
-                foreach (var login in logins)
-                {
-                    if (!Serializer.IsLoginCorrect(login))
-                    {
-                        Console.WriteLine($"{login.Name} : Isn't correct user");
-                        foreach (var window in login.Windows)
-                        {
-                            Console.WriteLine($"Title: {window.Title}\nTop: {window.Top} " +
-                                              $"Bottom: {window.Width} " +
-                                              $"Left: {window.Left} " +
-                                              $"Right: {window.Height} ");
-                        }
-                    }
-                }
-            }
 
-            Serializer.XmlSplitting();
-            if (logins != null)
-                foreach (var login in logins)
-                {
-                    Serializer.JsonSerialize(login);
-                }
+            Task.Run(async () => 
+                await Operations(logins));
             
+// Serializer.XmlSerialize(logins);
+            // logins = Serializer.XmlDeserialize();
+            // if (logins != null)
+            // {
+            //     foreach (var login in logins)
+            //     {
+            //         if (!Serializer.IsLoginCorrect(login))
+            //         {
+            //             Console.WriteLine($"{login.Name} : Isn't correct user");
+            //             foreach (var window in login.Windows)
+            //             {
+            //                 Console.WriteLine($"Title: {window.Title}\nTop: {window.Top} " +
+            //                                   $"Bottom: {window.Width} " +
+            //                                   $"Left: {window.Left} " +
+            //                                   $"Right: {window.Height} ");
+            //             }
+            //         }
+            //     }
+            // }
         }
     }
 }
