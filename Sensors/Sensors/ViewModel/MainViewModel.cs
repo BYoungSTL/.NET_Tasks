@@ -9,6 +9,7 @@ using Microsoft.Toolkit.Extensions;
 using Microsoft.Toolkit.Helpers;
 using Sensors.Annotations;
 using Sensors.Model;
+using Sensors.Model.Data;
 using Sensors.Model.Data.Factory;
 
 namespace Sensors.ViewModel
@@ -16,9 +17,21 @@ namespace Sensors.ViewModel
     class MainViewModel : INotifyPropertyChanged
     {
         private Sensor _sens = new Sensor();
-        private string _mainTextBlock;
-        private List<Sensor> sensors = new List<Sensor>();
-        public Guid Id { get; set; }
+        private string _mainTextBlock = "";
+        private List<Sensor> _sensors = new List<Sensor>();
+        private Guid _id;
+
+
+        public Guid Id
+        {
+            get => _id;
+            set
+            {
+                Sens.Id = value;
+                _id = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string MainTextBlock
         {
@@ -50,8 +63,8 @@ namespace Sensors.ViewModel
             RefreshCommandProperty = new AsyncCommand<bool>(async () =>
             {
                 MainTextBlock = "";
-                sensors = await SensorOptions.JsonDeserialize();
-                foreach (var sensor in sensors)
+                _sensors = await SensorOptions.JsonDeserialize();
+                foreach (var sensor in _sensors)
                 {
                     MainTextBlock += "ID: " + sensor.Id.ToString() + "\n";
                     MainTextBlock += "Type: " + sensor.Type + "\n";
@@ -75,6 +88,17 @@ namespace Sensors.ViewModel
             ChangeCommandProperty = new AsyncCommand<bool>(async () =>
             {
                 await SensorOptions.JsonChange(Id, Sens);
+                return true;
+            });
+            FindCommandProperty = new AsyncCommand<bool>(async () =>
+            {
+                Sensor findSensor = await SensorOptions.JsonFind(Id);
+                if (findSensor == null)
+                {
+                    return false;
+                }
+
+                Sens = findSensor;
                 return true;
             });
         }

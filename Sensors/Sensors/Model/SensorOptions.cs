@@ -34,15 +34,15 @@ namespace Sensors.Model
                 sensor.Interval = DefaultValueInt;
             }
 
-            if (sensor.Type == "")
+            if (string.IsNullOrEmpty(sensor.Type))
             {
                 sensor.Type = DefaultValueString;
             }
-            if (sensor.MeasuredName == "")
+            if (string.IsNullOrEmpty(sensor.MeasuredName))
             {
                 sensor.MeasuredName = DefaultValueString;
             }
-            if (sensor.MeasuredValue == "")
+            if (string.IsNullOrEmpty(sensor.MeasuredValue))
             {
                 sensor.MeasuredValue = DefaultValueString;
             }
@@ -117,10 +117,19 @@ namespace Sensors.Model
             return true;
         }
 
-        // public static async Task<Sensor> JsonFind(Guid id)
-        // {
-        //     
-        // }
+        public static async Task<Sensor> JsonFind(Guid id)
+        {
+            List<Sensor> sensors = await JsonDeserialize();
+            foreach (var sensor in sensors)
+            {
+                if (sensor.Id == id)
+                {
+                    return sensor;
+                }
+            }
+
+            return null;
+        }
 
         public ISensor Create()
         {
@@ -130,7 +139,6 @@ namespace Sensors.Model
                 Type = "Default Type",
                 MeasuredName = "Default Measured Name",
                 MeasuredValue = "Default Measured Value",
-
             };
         }
     }

@@ -43,10 +43,10 @@
             <Button Command="{Binding FindCommandProperty}" Content="Find" Grid.Column="0" Margin="290,64,10,10" />
             <Button Command="{Binding ChangeCommandProperty}" Content="Change" Grid.Column="0" Margin="150,64,150,10" />
 
-            <TextBox Text ="{Binding Sens.MeasuredName, Mode=OneWayToSource}" HorizontalAlignment="Left" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0" />
-            <TextBox Text="{Binding Sens.Type, Mode=OneWayToSource}" HorizontalAlignment="Left" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0" />
-            <TextBox Text="{Binding Sens.Interval, Mode=OneWayToSource}" HorizontalAlignment="Left" Grid.Row="4" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0"/>
-            <TextBox Text="{Binding Sens.MeasuredValue, Mode=OneWayToSource}" HorizontalAlignment="Left" Grid.Row="3" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0" />
+            <TextBox Text ="{Binding Sens.MeasuredName, Mode=TwoWay}" HorizontalAlignment="Left" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0" />
+            <TextBox Text="{Binding Sens.Type, Mode=TwoWay}" HorizontalAlignment="Left" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0" />
+            <TextBox Text="{Binding Sens.Interval, Mode=TwoWay}" HorizontalAlignment="Left" Grid.Row="4" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0"/>
+            <TextBox Text="{Binding Sens.MeasuredValue, Mode=TwoWay}" HorizontalAlignment="Left" Grid.Row="3" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0" />
             <TextBox Text="{Binding Id, Mode=OneWayToSource}" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Height ="26" Width="166" Margin="222,18,0,0" />
 
             <TextBlock HorizontalAlignment="Left" Height="38" Margin="10,11,0,0" Grid.Row="5" Text="Mode" TextWrapping="Wrap" VerticalAlignment="Top" Width="87" FontSize="27" FontFamily="Franklin Gothic Medium" TextAlignment="Left"/>
@@ -56,7 +56,9 @@
             <TextBlock HorizontalAlignment="Left" Height="38" Grid.Row="3" Text="Measured Value" TextWrapping="Wrap" VerticalAlignment="Center" Width="168" FontSize="22" FontFamily="Franklin Gothic Medium" TextAlignment="Left" Margin="10,0,0,0"/>
             <TextBlock Grid.Row="0" HorizontalAlignment="Left" Height="38" Margin="10,12,0,0" Text="ID" TextWrapping="Wrap" VerticalAlignment="Top" Width="87" FontSize="27" FontFamily="Franklin Gothic Medium" TextAlignment="Left"/>
 
-            <ComboBox ItemsSource="{Binding Source={StaticResource dataFromEnum}}" HorizontalAlignment="Left" Margin="222,17,0,0" Grid.Row="5" VerticalAlignment="Top" Height ="26" Width="166"
+            <ComboBox ItemsSource="{Binding Source={StaticResource dataFromEnum}}"
+                      SelectedItem="{Binding Sens.Mode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      HorizontalAlignment="Left" Margin="222,17,0,0" Grid.Row="5" VerticalAlignment="Top" Height ="26" Width="166"
                       IsReadOnly="True">
             </ComboBox>
 
@@ -64,9 +66,10 @@
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="70"/>
-                <RowDefinition Height="380"/>
+                <RowDefinition Height="264.04"/>
+                <RowDefinition Height="115.96"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="{Binding MainTextBlock}" Grid.Row="1" Background="#FF9CA8F7" Margin="0,0,0,16"/>
+            <TextBlock Text="{Binding MainTextBlock}" Grid.Row="1" Background="#FF9CA8F7" Margin="0,0,0,16" Grid.RowSpan="2"/>
             <Button Command="{Binding RefreshCommandProperty}" Grid.Row="0" Content="Refresh" Margin="145,22,155,22" MaxWidth="100" MinWidth="100" MaxHeight="26" MinHeight="26" />
         </Grid>
 
