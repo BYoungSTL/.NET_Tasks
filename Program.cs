@@ -5,7 +5,7 @@ using NET02._2.Serializers;
 
 namespace NET02._2
 {
-    class Program
+    static class Program
     {
         
         private static async Task Operations(List<Login> logins)
@@ -51,12 +51,12 @@ namespace NET02._2
                 Left = 15,
                 Title = "main"
             };
-            Login login1 = new Login()
+            Login login1 = new Login
             {
                 Name = "Guf",
                 Windows = new List<Window>{first, second}
             };
-            Login login2 = new Login()
+            Login login2 = new Login
             {
                 Name = "Fuf",
                 Windows = new List<Window>{first, third}
@@ -65,26 +65,6 @@ namespace NET02._2
 
             Task.Run(async () => 
                 await Operations(logins));
-            
-// Serializer.XmlSerialize(logins);
-            // logins = Serializer.XmlDeserialize();
-            // if (logins != null)
-            // {
-            //     foreach (var login in logins)
-            //     {
-            //         if (!Serializer.IsLoginCorrect(login))
-            //         {
-            //             Console.WriteLine($"{login.Name} : Isn't correct user");
-            //             foreach (var window in login.Windows)
-            //             {
-            //                 Console.WriteLine($"Title: {window.Title}\nTop: {window.Top} " +
-            //                                   $"Bottom: {window.Width} " +
-            //                                   $"Left: {window.Left} " +
-            //                                   $"Right: {window.Height} ");
-            //             }
-            //         }
-            //     }
-            // }
         }
     }
 }

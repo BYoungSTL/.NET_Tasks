@@ -17,7 +17,6 @@ namespace NET02._2.Serializers
             XmlSerializer formatterLogin = new XmlSerializer(typeof(List<Login>));
             using FileStream fileStream = new FileStream(FileName, FileMode.OpenOrCreate);
             formatterLogin.Serialize(fileStream, logins);
-            Console.WriteLine("Serialize");
         }
 
         public async Task<List<T>> Deserialize()
@@ -25,7 +24,6 @@ namespace NET02._2.Serializers
             XmlSerializer formatterLogin = new XmlSerializer(typeof(List<T>));
             using FileStream fileStream = new FileStream(FileName, FileMode.OpenOrCreate);
             List<T> logins = formatterLogin.Deserialize(fileStream) as List<T>;
-            Console.WriteLine("Deserialize");
             return logins;
         }
     }

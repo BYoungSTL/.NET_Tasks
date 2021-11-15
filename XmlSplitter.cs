@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace NET02._2
 {
-    public class XmlSplitter
+    public static class XmlSplitter
     {
         private static readonly string FileName = Directory.GetCurrentDirectory() + "\\Config\\UserSettings.xml";
         private static readonly string SplitXmlFilePath = Directory.GetCurrentDirectory() + "\\Config\\";
