@@ -7,7 +7,7 @@ namespace NET02.Entities
 {
     public class Catalog : IEnumerable
     {
-        public List<Book> Books { get; set; }
+        public List<Book> Books { get; init; }
         
         //IEnumerator returns sorted list of books
         public IEnumerator GetEnumerator()
@@ -26,7 +26,7 @@ namespace NET02.Entities
         {
             get
             {
-                return Books.FirstOrDefault(b => b.ISBNCode.Equals(Book.ISBNCodeСoercion(isbnCode)));
+                return Books.FirstOrDefault(b => b.ISBNCode.Equals(Book.IsbnCodeСorrection(isbnCode)));
             }
         }
         

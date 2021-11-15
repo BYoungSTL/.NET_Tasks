@@ -6,9 +6,9 @@ using NET02.Entities;
 
 namespace NET02
 {
-    public class Program
+    public static class Program
     {
-        public static Catalog InitCatalog()
+        private static Catalog InitCatalog()
         {
             Author firstAuthor = new Author
             (
@@ -56,7 +56,8 @@ namespace NET02
             }
             return newCatalog;
         }
-        static void Main(string[] args)
+
+        private static void Main(string[] args)
         {
             Catalog catalog = InitCatalog();
             

@@ -19,7 +19,7 @@ namespace NET02.Entities
         public string ISBNCode
         {
             get => _isbnCode;
-            private init => _isbnCode = ISBNCodeСoercion(value);
+            private init => _isbnCode = IsbnCodeСorrection(value);
         }
 
         public Book(string isbnCode, string name, List<Author> authors, DateTime publicationDate)
@@ -54,7 +54,7 @@ namespace NET02.Entities
             return (obj as Book)!.ISBNCode.Equals(this.ISBNCode);
         }
 
-        public static string ISBNCodeСoercion(string value)
+        public static string IsbnCodeСorrection(string value)
         {
             if (!FirstRegex.Match(value).Success && !SecondRegex.Match(value).Success)
             {
