@@ -5,9 +5,9 @@ using System.Reflection;
 using ListenerInterfaces;
 using NLog;
 using NLog.Config;
-using NLog.Layouts;
 using NLog.Targets;
 using static System.Diagnostics.EventLog;
+using Microsoft.Win32;
 
 namespace LogListener
 {
@@ -23,19 +23,16 @@ namespace LogListener
     /// </summary>
     public class EventLogListener : IListener
     {
-        private string _loggerNamePattern;
         private string _path;
         private readonly string _writeString = $"{DateTime.Now}, {Assembly.GetExecutingAssembly().Location} ";
-        private const string SecondLayout = "${longdate} ${uppercase:${level}} ${message} ${newline}";
-        private const string FirstLayout = "${longdate} ${callsite} ${uppercase:${level}} ${message} ${newline}";
 
         public ListenerType Type { get; set; }
 
-        public Logger _Logger { get; set; }
+        public Logger CustomLogger { get; set; }
 
-        public void Listener(LogLevel logLevel, string message)
+        public void LoggerSetting(LogLevel logLevel, string message)
         {
-            _Logger = LogManager.GetLogger(Type.ToString().ToLower());
+            CustomLogger = LogManager.GetLogger(Type.ToString().ToLower());
             if (!SourceExists("log"))
             {
                 CreateEventSource("log", "Application");
@@ -50,15 +47,15 @@ namespace LogListener
             {
                 case "error":
                 case "fatal":
-                    _Logger.Error(message);
+                    CustomLogger.Error(message);
                     eventLog.WriteEntry(_writeString + message, EventLogEntryType.Error);
                     break;
                 case "warn":
-                    _Logger.Warn(message);
+                    CustomLogger.Warn(message);
                     eventLog.WriteEntry(_writeString + message, EventLogEntryType.Warning);
                     break;
                 default:
-                    _Logger.Info(message);
+                    CustomLogger.Info(message);
                     eventLog.WriteEntry(_writeString + message, EventLogEntryType.Information);
                     break;
             }
@@ -66,6 +63,7 @@ namespace LogListener
 
         public void DefaultLoggerOptions()
         {
+            CreateRegistry();
             _path = Directory.GetCurrentDirectory() + $"\\logs\\log\\{DateTime.Now:yy-MM-dd}.log";
             Type = ListenerType.EventLog;
             LoggingConfiguration configuration = new LoggingConfiguration();
@@ -78,80 +76,34 @@ namespace LogListener
             LogManager.Configuration = configuration;
         }
 
-        public void CustomLoggerOptions()
+        private void CreateRegistry()
         {
-            Type = ListenerType.Txt;
-            
-            Console.WriteLine("Enter name of log file (enter date for yy-MM-dd format):");
-            string fileName = Console.ReadLine() ?? string.Empty;
-            if (fileName.ToLower() == "date")
+            RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("SYSTEM", false)
+                ?.OpenSubKey("CurrentControlSet", false)?.OpenSubKey("Services", true)
+                ?.OpenSubKey("Application", true);
+            try
             {
-                _path = Directory.GetCurrentDirectory() + $"\\logs\\log\\{DateTime.Now:yy-MM-dd}.log";    
+                registryKey?.OpenSubKey("EventLog");
             }
-            else
+            catch 
             {
-                _path = Directory.GetCurrentDirectory() + $"\\logs\\log\\{fileName}.log";
+                if (registryKey != null)
+                {
+                    registryKey.CreateSubKey("EventLog")?.CreateSubKey("log");
+                    registryKey.SetValue("log", RegistryValueKind.None);
+                }
+                return;
             }
-
-            //LoggerNamePattern it's a Target and Rule Name
-            Console.WriteLine("Enter loggerNamePattern: ");
-            _loggerNamePattern = Console.ReadLine() ?? string.Empty;
-            
-            LoggingConfiguration configuration = new LoggingConfiguration();
-            FileTarget logfile = new FileTarget
+            if (registryKey?.OpenSubKey("EventLog") != null)
             {
-                FileName = _path,
-                Name = _loggerNamePattern
-            };
-            configuration.LoggingRules.Add(new LoggingRule(_loggerNamePattern, LogLevel.Trace, logfile));
-            LogManager.Configuration = configuration;
-            
-            Console.WriteLine("Enter Logging Level (debug, info, error, fatal, warn, trace)");
-            Console.WriteLine("If input is invalid: Logging level = trace");
-            string level = Console.ReadLine() ?? string.Empty;
-            
-            LogLevel logLevel;
-            switch (level.ToLower())
-            {
-                case "debug":
-                    logLevel = LogLevel.Debug;
-                    break;
-                case "info":
-                case "information":
-                    logLevel = LogLevel.Info;
-                    break;
-                case "error":
-                    logLevel = LogLevel.Error;
-                    break;
-                case "fatal":
-                    logLevel = LogLevel.Fatal;
-                    break;
-                case "warning":
-                case "warn":
-                    logLevel = LogLevel.Warn;
-                    break;
-                default:
-                    logLevel = LogLevel.Trace;
-                    break;
+                registryKey.OpenSubKey("EventLog", true)?.DeleteSubKey("log");
             }
 
-            Console.WriteLine("Choose format layout");
-            Console.WriteLine("1) Date, callsite, logging level, message");
-            Console.WriteLine("2) Date, logging level, message");
-            int numberFormat = int.Parse(Console.ReadLine() ?? string.Empty);
-            switch (numberFormat)
+            if (registryKey != null)
             {
-                case 2:
-                    logfile.Layout = new SimpleLayout
-                        {Text = SecondLayout};
-                    break;
-                default:
-                    logfile.Layout = new SimpleLayout
-                        {Text = FirstLayout};
-                    break;
+                registryKey.CreateSubKey("EventLog")?.CreateSubKey("log");
+                registryKey.SetValue("log", RegistryValueKind.None);
             }
-            configuration.LoggingRules.Add(new LoggingRule(_loggerNamePattern, logLevel, logfile));
-            LogManager.Configuration = configuration;
         }
     }
 }

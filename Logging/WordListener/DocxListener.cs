@@ -18,56 +18,37 @@ namespace WordListener
     /// </summary>
     public class DocxListener : IListener
     {
-        private readonly string _tempFile = Directory.GetCurrentDirectory() + $"\\logs\\word\\{DateTime.Now:yy-MM-dd}.txt";
         private string _path;
         private StringBuilder _writeString;
         public ListenerType Type { get; set; }
 
-        public Logger _Logger { get; set; }
+        public Logger CustomLogger { get; set; }
 
-        public void Listener(LogLevel logLevel, string message)
+        public void LoggerSetting(LogLevel logLevel, string message)
         {
-            string docText = null;
-            if (File.Exists(_tempFile))
+            if (!File.Exists(_path))
             {
-                docText = File.ReadAllText(_tempFile);
+                WordprocessingDocument create =
+                    WordprocessingDocument.Create(_path, WordprocessingDocumentType.Document);
             }
-
-            if (docText == "")
-            {
-                docText = null;
-            }
-
             using WordprocessingDocument word =
-                WordprocessingDocument.Create(_path, WordprocessingDocumentType.Document);
-
+                WordprocessingDocument.Open(_path, true);
             
-            MainDocumentPart mainPart = word.AddMainDocumentPart();
-            mainPart.Document = new Document();
-            
-            Body body = mainPart.Document.AppendChild(new Body());
-
-            Paragraph paragraph = body.AppendChild(new Paragraph());
-
-            Run run = paragraph.AppendChild(new Run());
-
             StringBuilder newString =
                 _writeString.Insert(_writeString.Length, new StringBuilder($"{logLevel.Name}" + message));
-
-            if (docText != null)
+            
+            MainDocumentPart mainPart = word.MainDocumentPart;
+            if (mainPart == null)
             {
-                run.AppendChild(new Text(docText));
-                run.AppendChild(new Paragraph());
+                mainPart = word.AddMainDocumentPart();
             }
-            
-
-            run.AppendChild(new Text(newString.ToString()));
-            run.AppendChild(new Paragraph());
-            
-            //Creating txt file for addition docx file
-            using FileStream fileStream = new FileStream(_tempFile, FileMode.OpenOrCreate);
-            byte[] array = Encoding.Default.GetBytes(newString.ToString());
-            fileStream.Write(array, 0 , array.Length);
+            mainPart.Document = new Document(
+                new Body(
+                    new Paragraph(
+                        new Run(
+                            new Text(newString.ToString()))),
+                    new Paragraph()
+                ));
         }
 
         public void DefaultLoggerOptions()
@@ -77,37 +58,6 @@ namespace WordListener
             _writeString =
                 new StringBuilder($"{DateTime.Now}, {Assembly.GetExecutingAssembly().Location} ");
             Type = ListenerType.Txt;
-        }
-
-        public void CustomLoggerOptions()
-        {
-            Type = ListenerType.Word;
-
-            Console.WriteLine("Enter name of log file (enter date for yy-MM-dd format):");
-            string fileName = Console.ReadLine() ?? string.Empty;
-            if (fileName.ToLower() == "date")
-            {
-                _path = Directory.GetCurrentDirectory() + $"\\logs\\word\\{DateTime.Now:yy-MM-dd}.docx";
-            }
-            else
-            {
-                _path = Directory.GetCurrentDirectory() + $"\\logs\\txt\\{fileName}.docx";
-            }
-
-            Console.WriteLine("Choose format of log:");
-            Console.WriteLine("1) Date, Location, Logging Level, message");
-            Console.WriteLine("2) Date, Logging Level, message");
-
-            int numberFormat = int.Parse(Console.ReadLine() ?? string.Empty);
-            switch (numberFormat)
-            {
-                case 2:
-                    _writeString = new StringBuilder($"{DateTime.Now}, {Assembly.GetExecutingAssembly().Location} ");
-                    break;
-                default:
-                    _writeString = new StringBuilder($"{DateTime.Now} ");
-                    break;
-            }
         }
     }
 }
