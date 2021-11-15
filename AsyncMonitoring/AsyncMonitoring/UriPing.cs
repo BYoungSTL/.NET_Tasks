@@ -19,11 +19,12 @@ namespace AsyncMonitoring
 {
     public class UriPing
     {
+        private static readonly string Path = Directory.GetCurrentDirectory() + "//pingSettings.json";
         private const string FailedMessage = "Failed request";
         private const string SuccessfulMessage = "Successful request";
         private const string MailFrom = "babyragestl@gmail.com";
 
-        public PingProperties Properties { get; set; }
+        public List<PingProperties>? Properties { get; set; }
         
         private Uri _uri;
 
@@ -31,51 +32,53 @@ namespace AsyncMonitoring
         /// Ping some site, with delay and waiting time
         /// Logging into .txt file
         /// </summary>
-        public async Task Ping()
+        public async Task Ping(PingProperties pingProperties)
         {
             while (true)
             {
                 await JsonDeserialize();
-                _uri = new Uri(Properties.UriRef);
+                _uri = new Uri(pingProperties.UriRef);
                 Logger logger = LogManager.GetLogger("http");
                 try
                 {
                     HttpWebRequest webRequest = WebRequest.CreateHttp(_uri);
-                    Sleep(Properties.MaxWaitingTime);
+                    Sleep(pingProperties.MaxWaitingTime);
                     HttpWebResponse webResponse = webRequest.GetResponse() as HttpWebResponse;
-                    Console.WriteLine(SuccessfulMessage);
-                    logger.Debug(SuccessfulMessage);
+                    Console.WriteLine(pingProperties.UriRef + " " + SuccessfulMessage);
+                    logger.Debug(pingProperties.UriRef + " "+ SuccessfulMessage);
                 }
                 catch
                 {
-                    await SendEmailAsync(FailedMessage, "Fail Response");
-                    Console.WriteLine(FailedMessage);
-                    logger.Error(FailedMessage);
+                    await SendEmailAsync(FailedMessage, "Fail Response", pingProperties.MailTo);
+                    Console.WriteLine(pingProperties.UriRef + " " + FailedMessage);
+                    logger.Error(pingProperties.UriRef + " " + FailedMessage);
                 }
-                Sleep(Properties.Delay);
+                Sleep(pingProperties.Delay);
             }
         }
 
-        
 
         /// <summary>
         /// Sends email by admin mail to user mail
         /// Sends log with Failed Response
         /// Client connected to SMTP ver. of gmail.com
+        /// You can change MailFrom to other, but you need to keep your password at password.txt
+        /// For gmail, you can create an application password
         /// </summary>
         /// <param name="text"></param>
         /// <param name="subject"></param>
-        private async Task SendEmailAsync(string text, string subject)
+        /// <param name="mailTo"></param>
+        private async Task SendEmailAsync(string text, string subject, string mailTo)
         {
             MimeMessage emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress("Admin", MailFrom));
-            emailMessage.To.Add(new MailboxAddress("user", Properties.MailTo));
+            emailMessage.To.Add(new MailboxAddress("user", mailTo));
             emailMessage.Subject = subject;
             emailMessage.Body = new TextPart("Plain")
             {
                 Text = text
             };
-
+        
             string str = await File.ReadAllTextAsync(Directory.GetCurrentDirectory() + "\\password.txt");
             using var client = new SmtpClient();
             await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
@@ -87,17 +90,27 @@ namespace AsyncMonitoring
         public async void JsonDeserialize(object sender, FileSystemEventArgs fileSystemEventArgs)
         {
             Console.WriteLine("Changed");
-            await using FileStream fs = File.OpenRead(Directory.GetCurrentDirectory() + "\\pingSettings.json");
-            Properties = await JsonSerializer.DeserializeAsync<PingProperties>(fs);
+            await using FileStream fs = File.OpenRead(Path);
+            Properties = await JsonSerializer.DeserializeAsync<List<PingProperties>>(fs);
         }
         
         /// <summary>
         /// overload of JsonDeserialize to call from Ping();
         /// </summary>
-        private async Task JsonDeserialize()
+        public async Task JsonDeserialize()
         {
-            await using FileStream fs = File.OpenRead(Directory.GetCurrentDirectory() + "\\pingSettings.json");
-            Properties = await JsonSerializer.DeserializeAsync<PingProperties>(fs);
+            await using FileStream fs = File.OpenRead(Path);
+            Properties = await JsonSerializer.DeserializeAsync<List<PingProperties>>(fs);
+        }
+
+        public async Task JsonSerialize()
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+            };
+            await using FileStream fs = new FileStream(Path, FileMode.OpenOrCreate);
+            await JsonSerializer.SerializeAsync(fs, Properties, options);
         }
     }
 }

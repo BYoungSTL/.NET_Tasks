@@ -1,6 +1,20 @@
-{
-  "UriRef": "https://vk.com/",
-  "MailTo": "85050108@study.bsuir.by",
-  "Delay": 1000,
-  "MaxWaitingTime": 100
-}
+[
+  {
+    "UriRef": "https://www.youtube.com/",
+    "MailTo": "85050108@study.bsuir.by",
+    "Delay": 1000,
+    "MaxWaitingTime": 100
+  },
+  {
+    "UriRef": "https://github.com/",
+    "MailTo": "85050108@study.bsuir.by",
+    "Delay": 1000,
+    "MaxWaitingTime": 100
+  },
+  {
+    "UriRef": "https://docs.microsoft.com/",
+    "MailTo": "85050108@study.bsuir.by",
+    "Delay": 1000,
+    "MaxWaitingTime": 100
+  }
+]

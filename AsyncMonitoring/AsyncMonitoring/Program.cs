@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using NLog;
 
@@ -71,9 +73,16 @@ namespace AsyncMonitoring
             if(System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Length > 1)
                 return;
             UriPing ping = new UriPing();
+            await ping.JsonDeserialize();
+            List<Task> tasks = new List<Task>();
+            if (ping.Properties != null)
+            {
+                tasks.AddRange(ping.Properties.Select(pingProperty => Task.Run(() => ping.Ping(pingProperty))));
+            }
 
-            await ping.Ping();
+            await Task.WhenAll(tasks.ToArray());
             await FileWatcher(ping);
+            //await ping.JsonSerialize();
         }
     }
 }
