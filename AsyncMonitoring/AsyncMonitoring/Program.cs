@@ -82,7 +82,6 @@ namespace AsyncMonitoring
 
             await Task.WhenAll(tasks.ToArray());
             await FileWatcher(ping);
-            //await ping.JsonSerialize();
         }
     }
 }

@@ -24,7 +24,7 @@ namespace AsyncMonitoring
         private const string SuccessfulMessage = "Successful request";
         private const string MailFrom = "babyragestl@gmail.com";
 
-        public List<PingProperties>? Properties { get; set; }
+        public List<PingProperties> Properties { get; private set; }
         
         private Uri _uri;
 
@@ -44,13 +44,11 @@ namespace AsyncMonitoring
                     HttpWebRequest webRequest = WebRequest.CreateHttp(_uri);
                     Sleep(pingProperties.MaxWaitingTime);
                     HttpWebResponse webResponse = webRequest.GetResponse() as HttpWebResponse;
-                    Console.WriteLine(pingProperties.UriRef + " " + SuccessfulMessage);
                     logger.Debug(pingProperties.UriRef + " "+ SuccessfulMessage);
                 }
                 catch
                 {
                     await SendEmailAsync(FailedMessage, "Fail Response", pingProperties.MailTo);
-                    Console.WriteLine(pingProperties.UriRef + " " + FailedMessage);
                     logger.Error(pingProperties.UriRef + " " + FailedMessage);
                 }
                 Sleep(pingProperties.Delay);
@@ -85,7 +83,6 @@ namespace AsyncMonitoring
             await client.AuthenticateAsync(MailFrom, str);
             await client.SendAsync(emailMessage);
         }
-
         
         public async void JsonDeserialize(object sender, FileSystemEventArgs fileSystemEventArgs)
         {

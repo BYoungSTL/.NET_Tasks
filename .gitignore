@@ -90,3 +90,7 @@ AsyncMonitoring/AsyncMonitoring/obj/project.nuget.cache
 AsyncMonitoring/AsyncMonitoring/obj/project.packagespec.json
 
 AsyncMonitoring/AsyncMonitoring/obj/rider.project.restore.info
+
+AsyncMonitoring/.vs/
+
+AsyncMonitoring/AsyncMonitoring/.idea/
