@@ -2,6 +2,6 @@
 {
     public interface ISensorFactory
     {
-        ISensor Create();
+        public ISensor Create();
     }
 }

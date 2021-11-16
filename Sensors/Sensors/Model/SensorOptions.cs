@@ -7,14 +7,13 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Sensors.Model.Data;
 using Sensors.Model.Data.Factory;
+using Sensors.Model.Data.State;
 
 namespace Sensors.Model
 {
     public class SensorOptions : ISensorFactory
     {
         private static readonly string Path = Directory.GetCurrentDirectory() + "\\sensorsSpecification.json";
-        private const string DefaultValueString = "Unknown";
-        private const int DefaultValueInt = 10;
 
         public static async Task<List<Sensor>> JsonDeserialize()
         {
@@ -29,25 +28,6 @@ namespace Sensors.Model
 
         public static async Task<bool> JsonSerialize(Sensor sensor)
         {
-            if (sensor.Interval == 0)
-            {
-                sensor.Interval = DefaultValueInt;
-            }
-
-            if (string.IsNullOrEmpty(sensor.Type))
-            {
-                sensor.Type = DefaultValueString;
-            }
-            if (string.IsNullOrEmpty(sensor.MeasuredName))
-            {
-                sensor.MeasuredName = DefaultValueString;
-            }
-            if (string.IsNullOrEmpty(sensor.MeasuredValue))
-            {
-                sensor.MeasuredValue = DefaultValueString;
-            }
-            sensor.Id = IdGenerator.Generate();
-
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
@@ -117,6 +97,11 @@ namespace Sensors.Model
             return true;
         }
 
+        public static async Task ValueCounting(Sensor sensor)
+        {
+
+        }
+
         public static async Task<Sensor> JsonFind(Guid id)
         {
             List<Sensor> sensors = await JsonDeserialize();
@@ -133,12 +118,13 @@ namespace Sensors.Model
 
         public ISensor Create()
         {
-            return new Sensor()
+            return new Sensor
             {
                 Id = IdGenerator.Generate(),
                 Type = "Default Type",
                 MeasuredName = "Default Measured Name",
-                MeasuredValue = "Default Measured Value",
+                MeasuredValue = 0,
+                Mode = EnumMode.Simple,
             };
         }
     }

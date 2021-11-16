@@ -16,10 +16,20 @@ namespace Sensors.ViewModel
 {
     class MainViewModel : INotifyPropertyChanged
     {
-        private Sensor _sens = new Sensor();
+        private ISensor _sens = new SensorOptions().Create();
         private string _mainTextBlock = "";
         private List<Sensor> _sensors = new List<Sensor>();
         private Guid _id;
+        private int _measuredValue;
+
+        public int MeasuredValue
+        {
+            get => _measuredValue;
+            set
+            {
+
+            }
+        }
 
 
         public Guid Id
@@ -43,7 +53,7 @@ namespace Sensors.ViewModel
             }
 
         }
-        public Sensor Sens
+        public ISensor Sens
         {
             get => _sens;
             set
@@ -77,7 +87,7 @@ namespace Sensors.ViewModel
             });
             CreateCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                await SensorOptions.JsonSerialize(Sens);
+                await SensorOptions.JsonSerialize(Sens as Sensor);
                 return true;
             });
             DeleteCommandProperty = new AsyncCommand<bool>(async () =>
@@ -87,7 +97,7 @@ namespace Sensors.ViewModel
             });
             ChangeCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                await SensorOptions.JsonChange(Id, Sens);
+                await SensorOptions.JsonChange(Id, Sens as Sensor);
                 return true;
             });
             FindCommandProperty = new AsyncCommand<bool>(async () =>
