@@ -7,7 +7,5 @@ namespace Sensors.Model.Data.State
         void StateSimple();
         void StateCalibration();
         void StateWork();
-
-        void Counting(Sensor sensor);
     }
 }

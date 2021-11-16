@@ -21,14 +21,5 @@ namespace Sensors.Model.Data.State
         {
             
         }
-
-        public void Counting(Sensor sensor)
-        {
-            Task.Run(() =>
-            {
-                sensor.MeasuredValue = new Random().Next(101);
-                Thread.Sleep(sensor.Interval);
-            });
-        }
     }
 }

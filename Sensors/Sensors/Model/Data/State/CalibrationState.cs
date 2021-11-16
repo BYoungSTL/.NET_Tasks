@@ -20,16 +20,5 @@ namespace Sensors.Model.Data.State
         {
             
         }
-
-        public void Counting(Sensor sensor)
-        {
-            sensor.Interval = 1000;
-            sensor.MeasuredValue = 0;
-            Task.Run(() =>
-            {
-                sensor.MeasuredValue += 1;
-                Thread.Sleep(sensor.MeasuredValue);
-            });
-        }
     }
 }
