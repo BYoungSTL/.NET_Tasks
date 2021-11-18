@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NLog;
+using static AsyncMonitoring.PingManager;
 
 namespace AsyncMonitoring
 {
@@ -11,28 +13,30 @@ namespace AsyncMonitoring
     {
         //File Watcher Logger and methods
         private static readonly Logger Logger = LogManager.GetLogger("change");
+
         private static void OnChanged(object sender, FileSystemEventArgs e)
         {
             if (e.ChangeType != WatcherChangeTypes.Changed)
             {
                 return;
             }
+
             Logger.Info("Options change");
         }
-        
+
         private static void OnDeleted(object sender, FileSystemEventArgs e) =>
-            Logger.Info($"Deleted: {e.FullPath}");    
-        
+            Logger.Info($"Deleted: {e.FullPath}");
+
         private static void OnRenamed(object sender, RenamedEventArgs e)
         {
             Logger.Info($"File Rename     Old: {e.OldFullPath}     New: {e.FullPath}");
         }
-        
+
         private static void OnError(object sender, ErrorEventArgs e)
-        { 
+        {
             PrintException(e.GetException());
         }
-        
+
         private static void PrintException(Exception ex)
         {
             if (ex == null) return;
@@ -40,12 +44,10 @@ namespace AsyncMonitoring
             PrintException(ex.InnerException);
         }
 
-        private static Task FileWatcher(UriPing ping)
+        public static async Task FileWatcher(UriPing ping)
         {
-             
             using var watcher = new FileSystemWatcher(Directory.GetCurrentDirectory());
 
-            var tcs = new TaskCompletionSource<bool>();
             watcher.NotifyFilter = NotifyFilters.Attributes
                                    | NotifyFilters.CreationTime
                                    | NotifyFilters.DirectoryName
@@ -62,26 +64,28 @@ namespace AsyncMonitoring
             watcher.Error += OnError;
 
             watcher.Filter = "pingSettings.json";
-            watcher.IncludeSubdirectories = true;
+            watcher.IncludeSubdirectories = false;
             watcher.EnableRaisingEvents = true;
-            return tcs.Task;
+            watcher.SynchronizingObject = null;
+            watcher.InternalBufferSize = 65536;
+
+            watcher.BeginInit();
         }
         
-        static async Task Main(string[] args)
+
+        static void Main(string[] args)
         {
             //Only one instance can be run, others instance shutdown at once
-            if(System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Length > 1)
+            if (System.Diagnostics.Process
+                .GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Length > 1)
                 return;
+            Console.WriteLine("Main");
+            
             UriPing ping = new UriPing();
-            await ping.JsonDeserialize();
-            List<Task> tasks = new List<Task>();
-            if (ping.Properties != null)
-            {
-                tasks.AddRange(ping.Properties.Select(pingProperty => Task.Run(() => ping.Ping(pingProperty))));
-            }
-
-            await Task.WhenAll(tasks.ToArray());
-            await FileWatcher(ping);
+            ping.JsonDeserializeSync();
+            
+            Task.Run(() => FileWatcher(ping));    
+            Task.Run(() => Start(ping)).Wait();
         }
     }
 }
