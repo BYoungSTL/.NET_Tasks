@@ -6,7 +6,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Sensors.Model.Data;
+using Sensors.Model.Data.Enums;
 using Sensors.Model.Data.Factory;
+using Sensors.Model.Data.Factory.Sensors;
 using Sensors.Model.Data.State;
 
 namespace Sensors.Model
@@ -15,7 +17,7 @@ namespace Sensors.Model
     {
         private static readonly string Path = Directory.GetCurrentDirectory() + "\\sensorsSpecification.json";
 
-        public static async Task<List<Sensor>> JsonDeserialize()
+        public static async Task<List<ISensor>> JsonDeserialize()
         {
             var options = new JsonSerializerOptions
             {
@@ -23,29 +25,29 @@ namespace Sensors.Model
             };
             await using FileStream fs = new FileStream(Path,
                 FileMode.OpenOrCreate);
-            return await JsonSerializer.DeserializeAsync<List<Sensor>>(fs, options);
+            return await JsonSerializer.DeserializeAsync<List<ISensor>>(fs, options);
         }
 
-        public static async Task<bool> JsonSerialize(Sensor sensor)
+        public static async Task<bool> JsonSerialize(ISensor sensor)
         {
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
             };
 
-            List<Sensor> sensors = new List<Sensor>();
+            List<ISensor> sensors = new List<ISensor>();
             await using (FileStream fs = new FileStream(Path,
                 FileMode.OpenOrCreate))
             {
                 if (new FileInfo(Path).Length != 0)
                 {
-                    sensors = await JsonSerializer.DeserializeAsync<List<Sensor>>(fs, options);
+                    sensors = await JsonSerializer.DeserializeAsync<List<ISensor>>(fs, options);
                 }
             }
 
             File.Delete(Path);
 
-            sensors ??= new List<Sensor>();
+            sensors ??= new List<ISensor>();
             sensors.Add(sensor);
 
             await using FileStream newfs = new FileStream(Path, FileMode.OpenOrCreate);
@@ -57,7 +59,7 @@ namespace Sensors.Model
 
         public static async Task<bool> JsonDelete(Guid id)
         {
-            List<Sensor> sensors = await JsonDeserialize();
+            List<ISensor> sensors = await JsonDeserialize();
             foreach (var sensor in sensors)
             {
                 if (sensor.Id == id)
@@ -75,14 +77,13 @@ namespace Sensors.Model
             return true;
         }
 
-        public static async Task<bool> JsonChange(Guid id, Sensor sensor)
+        public static async Task<bool> JsonChange(Guid id, TemperatureSensor sensor)
         {
-            List<Sensor> sensors = await JsonDeserialize();
+            List<ISensor> sensors = await JsonDeserialize();
             foreach (var sens in sensors)
             {
                 if (sens.Id == id)
                 {
-                    sens.Type = sensor.Type;
                     sens.MeasuredName = sensor.MeasuredName;
                     sens.MeasuredValue = sensor.MeasuredValue;
                     sens.Mode = sensor.Mode;
@@ -97,14 +98,35 @@ namespace Sensors.Model
             return true;
         }
 
-        public static async Task ValueCounting(Sensor sensor)
-        {
 
+        //???????????????
+        public static async Task ValueCounting(ISensor sensor)
+        {
+            bool isContinue = true;
+            while (isContinue)
+            {
+                switch (sensor.Mode)
+                {
+                    case EnumMode.Calibration:
+                        sensor.MeasuredValue += 1;
+                        await Task.Delay(sensor.Interval = 1000);
+                        break;
+                    case EnumMode.Work:
+                        sensor.MeasuredValue = new Random().Next(151);
+                        await Task.Delay(sensor.Interval);
+                        break;
+                    case EnumMode.Simple:
+                        sensor.MeasuredValue = 0;
+                        sensor.Interval = 0;
+                        isContinue = false;
+                        break;
+                }
+            }
         }
 
-        public static async Task<Sensor> JsonFind(Guid id)
+        public static async Task<ISensor> JsonFind(Guid id)
         {
-            List<Sensor> sensors = await JsonDeserialize();
+            List<ISensor> sensors = await JsonDeserialize();
             foreach (var sensor in sensors)
             {
                 if (sensor.Id == id)
@@ -116,16 +138,38 @@ namespace Sensors.Model
             return null;
         }
 
-        public ISensor Create()
+        public ISensor Create(EnumType type)
         {
-            return new Sensor
+            switch (type)
             {
-                Id = IdGenerator.Generate(),
-                Type = "Default Type",
-                MeasuredName = "Default Measured Name",
-                MeasuredValue = 0,
-                Mode = EnumMode.Simple,
-            };
+                case EnumType.Moisture:
+                    return new MoistureSensor
+                    {
+                        Id = IdGenerator.Generate(),
+                        MeasuredName = "Moisture",
+                        MeasuredValue = 0,
+                        State = new SimpleState(),
+                        Mode = EnumMode.Simple
+                    };
+                case EnumType.Pressure:
+                    return new PressureSensor
+                    {
+                        Id = IdGenerator.Generate(),
+                        MeasuredName = "Pressure",
+                        MeasuredValue = 0,
+                        State = new SimpleState(),
+                        Mode = EnumMode.Simple
+                    };
+                default:
+                    return new TemperatureSensor
+                    {
+                        Id = IdGenerator.Generate(),
+                        MeasuredName = "Temperature",
+                        MeasuredValue = 0,
+                        State = new SimpleState(),
+                        Mode = EnumMode.Simple
+                    };
+            }
         }
     }
 }

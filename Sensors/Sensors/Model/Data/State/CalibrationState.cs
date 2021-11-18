@@ -6,19 +6,19 @@ namespace Sensors.Model.Data.State
 {
     public class CalibrationState : ISensorState
     {
-        public void StateSimple()
+        public void StateSimple(ISensor sensor)
+        {
+            sensor.State = new SimpleState();
+        }
+
+        public void StateCalibration(ISensor sensor)
         {
             
         }
 
-        public void StateCalibration()
+        public void StateWork(ISensor sensor)
         {
-            
-        }
-
-        public void StateWork()
-        {
-            
+            sensor.State = new WorkState();
         }
     }
 }

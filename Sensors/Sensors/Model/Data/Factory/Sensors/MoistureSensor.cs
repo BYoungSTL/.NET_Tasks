@@ -1,21 +1,22 @@
 ﻿using System;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+using Sensors.Model.Data.Enums;
 using Sensors.Model.Data.State;
 
-namespace Sensors.Model.Data.Factory
+namespace Sensors.Model.Data.Factory.Sensors
 {
-    [Serializable, DataContract]
-    public class Sensor : ISensor
+    [Serializable]
+    public class MoistureSensor : ISensor
     {
-        public ISensorState State { get; set; }
+        [JsonIgnore] public ISensorState State { get; set; }
         public Guid Id { get; set; }
-        public string Type { get; set; }
+        public static EnumType Type = EnumType.Moisture;
         public string MeasuredName { get; set; }
-        public int MeasuredValue{ get; set; }
-        public int Interval { get; set; } 
+        public int MeasuredValue { get; set; }
+        public int Interval { get; set; }
         public EnumMode Mode { get; set; }
 
-        public Sensor()
+        public MoistureSensor()
         {
             switch (Mode)
             {

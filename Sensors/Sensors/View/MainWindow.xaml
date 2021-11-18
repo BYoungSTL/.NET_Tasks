@@ -7,13 +7,20 @@
         xmlns:vm="clr-namespace:Sensors.ViewModel"
         xmlns:system="clr-namespace:System;assembly=System.Runtime"
         xmlns:enum="clr-namespace:Sensors.Model.Data"
+        xmlns:enums="clr-namespace:Sensors.Model.Data.Enums"
+
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" Background="#FF7384F5">
 
     <Window.Resources>
-        <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+        <ObjectDataProvider x:Key="DataFromEnum" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="enum:EnumMode"/>
+                <x:Type TypeName="enums:EnumMode"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="DataFromTypeEnum" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="enums:EnumType"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Window.Resources>
@@ -43,21 +50,26 @@
             <Button Command="{Binding FindCommandProperty}" Content="Find" Grid.Column="0" Margin="290,64,10,10" />
             <Button Command="{Binding ChangeCommandProperty}" Content="Change" Grid.Column="0" Margin="150,64,150,10" />
 
+            <ComboBox ItemsSource="{Binding Source={StaticResource DataFromTypeEnum}}"
+                      SelectedItem="{Binding SensorType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      HorizontalAlignment="Left" Margin="222,17,0,0" Grid.Row="1" VerticalAlignment="Top" Height ="26" Width="166"
+                      IsReadOnly="True">
+            </ComboBox>
+
             <TextBox Text ="{Binding Sens.MeasuredName, Mode=TwoWay}" HorizontalAlignment="Left" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0" />
-            <TextBox Text="{Binding Sens.Type, Mode=TwoWay}" HorizontalAlignment="Left" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0" />
             <TextBox Text="{Binding Sens.Interval, Mode=TwoWay}" HorizontalAlignment="Left" Grid.Row="4" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0"/>
             <TextBox Text="{Binding Sens.MeasuredValue, Mode=TwoWay}" HorizontalAlignment="Left" Grid.Row="3" TextWrapping="Wrap" VerticalAlignment="Center" Height ="26" Width="166" Margin="222,0,0,0" />
             <TextBox Text="{Binding Id, Mode=OneWayToSource}" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Height ="26" Width="166" Margin="222,18,0,0" />
 
             <TextBlock HorizontalAlignment="Left" Height="38" Margin="10,11,0,0" Grid.Row="5" Text="Mode" TextWrapping="Wrap" VerticalAlignment="Top" Width="87" FontSize="27" FontFamily="Franklin Gothic Medium" TextAlignment="Left"/>
             <TextBlock HorizontalAlignment="Left" Height="38" Margin="10,12,0,0" Grid.Row="4" Text="Interval" TextWrapping="Wrap" VerticalAlignment="Top" Width="87" FontSize="27" FontFamily="Franklin Gothic Medium" TextAlignment="Center"/>
-            <TextBlock HorizontalAlignment="Left" Height="38" Margin="10,10,0,0" Grid.Row="1" Text="Type" TextWrapping="Wrap" VerticalAlignment="Top" Width="87" FontSize="27" FontFamily="Franklin Gothic Medium" TextAlignment="Left"/>
+            <TextBlock HorizontalAlignment="Left" Height="38" Margin="10,10,0,0" Grid.Row="1" Text="SensorType" TextWrapping="Wrap" VerticalAlignment="Top" Width="87" FontSize="27" FontFamily="Franklin Gothic Medium" TextAlignment="Left"/>
             <TextBlock HorizontalAlignment="Left" Height="38" Grid.Row="2" Text="Measured Name" TextWrapping="Wrap" VerticalAlignment="Center" Width="174" FontSize="22" FontFamily="Franklin Gothic Medium" TextAlignment="Left" Margin="10,0,0,0"/>
             <TextBlock HorizontalAlignment="Left" Height="38" Grid.Row="3" Text="Measured Value" TextWrapping="Wrap" VerticalAlignment="Center" Width="168" FontSize="22" FontFamily="Franklin Gothic Medium" TextAlignment="Left" Margin="10,0,0,0"/>
             <TextBlock Grid.Row="0" HorizontalAlignment="Left" Height="38" Margin="10,12,0,0" Text="ID" TextWrapping="Wrap" VerticalAlignment="Top" Width="87" FontSize="27" FontFamily="Franklin Gothic Medium" TextAlignment="Left"/>
 
-            <ComboBox ItemsSource="{Binding Source={StaticResource dataFromEnum}}"
-                      SelectedItem="{Binding Sens.Mode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            <ComboBox ItemsSource="{Binding Source={StaticResource DataFromEnum}}"
+                      SelectedItem="{Binding SensorMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       HorizontalAlignment="Left" Margin="222,17,0,0" Grid.Row="5" VerticalAlignment="Top" Height ="26" Width="166"
                       IsReadOnly="True">
             </ComboBox>

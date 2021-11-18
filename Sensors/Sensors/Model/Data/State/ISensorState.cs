@@ -4,8 +4,8 @@ namespace Sensors.Model.Data.State
 {
     public interface ISensorState
     {
-        void StateSimple();
-        void StateCalibration();
-        void StateWork();
+        void StateSimple(ISensor sensor);
+        void StateCalibration(ISensor sensor);
+        void StateWork(ISensor sensor);
     }
 }
