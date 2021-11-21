@@ -5,16 +5,25 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows.Documents;
+using System.Windows.Media.Animation;
+using Newtonsoft.Json;
 using Sensors.Model.Data;
 using Sensors.Model.Data.Enums;
 using Sensors.Model.Data.Factory;
 using Sensors.Model.Data.Factory.Sensors;
 using Sensors.Model.Data.State;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Sensors.Model
 {
     public class SensorOptions : ISensorFactory
     {
+        private static bool _isContinue;
+        public delegate Task ValueCountHandler(ISensor sensor);
+
+        public static event ValueCountHandler Count;
+
         private static readonly string Path = Directory.GetCurrentDirectory() + "\\sensorsSpecification.json";
 
         public static async Task<List<ISensor>> JsonDeserialize()
@@ -23,9 +32,57 @@ namespace Sensors.Model
             {
                 IncludeFields = true
             };
+
             await using FileStream fs = new FileStream(Path,
                 FileMode.OpenOrCreate);
-            return await JsonSerializer.DeserializeAsync<List<ISensor>>(fs, options);
+            try
+            {
+                return await JsonSerializer.DeserializeAsync<List<ISensor>>(fs, options);
+            }
+            catch (NotSupportedException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public static List<ISensor> NewstonDeserialize(List<ISensor> sensors)
+        {
+            NewstonSerialize(sensors);
+            List<ISensor> test = new List<ISensor>();
+            try
+            {
+                test = JsonConvert.DeserializeObject<List<ISensor>>(File.ReadAllText(Path), new JsonSerializerSettings
+                {
+                    StringEscapeHandling = StringEscapeHandling.EscapeHtml,
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            return test;
+        }
+
+        public static void NewstonSerialize(List<ISensor> sensors)
+        {
+            sensors.Add(new TemperatureSensor()
+            {
+                Id = IdGenerator.Generate(),
+                Interval = 0,
+                MeasuredValue = 0,
+                MeasuredName = "govno",
+                Type = EnumType.Temperature,
+                Mode = EnumMode.Simple
+            });
+            var str = JsonConvert.SerializeObject(sensors, new JsonSerializerSettings()
+            {
+                StringEscapeHandling = StringEscapeHandling.EscapeHtml,
+                TypeNameHandling = TypeNameHandling.All
+            });
+            File.WriteAllText(Path, str);
         }
 
         public static async Task<bool> JsonSerialize(ISensor sensor)
@@ -36,15 +93,11 @@ namespace Sensors.Model
             };
 
             List<ISensor> sensors = new List<ISensor>();
-            await using (FileStream fs = new FileStream(Path,
-                FileMode.OpenOrCreate))
+            
+            if (new FileInfo(Path).Length != 0)
             {
-                if (new FileInfo(Path).Length != 0)
-                {
-                    sensors = await JsonSerializer.DeserializeAsync<List<ISensor>>(fs, options);
-                }
+                sensors = NewstonDeserialize(sensors);
             }
-
             File.Delete(Path);
 
             sensors ??= new List<ISensor>();
@@ -89,6 +142,8 @@ namespace Sensors.Model
                     sens.Mode = sensor.Mode;
                     File.Delete(Path);
                 }
+
+                await OnCount(sens);
             }
 
             foreach (var sens in sensors)
@@ -102,9 +157,22 @@ namespace Sensors.Model
         //???????????????
         public static async Task ValueCounting(ISensor sensor)
         {
-            bool isContinue = true;
-            while (isContinue)
+            _isContinue = true;
+            Count += (sensor1) =>
             {
+                if (sensor1.Mode != EnumMode.Simple)
+                {
+                    _isContinue = false;
+                }
+                return null;
+            };
+            if (sensor.isCounting)
+            {
+                return;
+            }
+            while (_isContinue)
+            {
+                sensor.isCounting = true;
                 switch (sensor.Mode)
                 {
                     case EnumMode.Calibration:
@@ -118,10 +186,14 @@ namespace Sensors.Model
                     case EnumMode.Simple:
                         sensor.MeasuredValue = 0;
                         sensor.Interval = 0;
-                        isContinue = false;
+                        _isContinue = false;
                         break;
                 }
             }
+
+            sensor.isCounting = false;
+            await JsonDelete(sensor.Id);
+            await JsonSerialize(sensor);
         }
 
         public static async Task<ISensor> JsonFind(Guid id)
@@ -149,7 +221,8 @@ namespace Sensors.Model
                         MeasuredName = "Moisture",
                         MeasuredValue = 0,
                         State = new SimpleState(),
-                        Mode = EnumMode.Simple
+                        Mode = EnumMode.Simple,
+                        isCounting = true
                     };
                 case EnumType.Pressure:
                     return new PressureSensor
@@ -158,7 +231,8 @@ namespace Sensors.Model
                         MeasuredName = "Pressure",
                         MeasuredValue = 0,
                         State = new SimpleState(),
-                        Mode = EnumMode.Simple
+                        Mode = EnumMode.Simple,
+                        isCounting = true
                     };
                 default:
                     return new TemperatureSensor
@@ -167,9 +241,16 @@ namespace Sensors.Model
                         MeasuredName = "Temperature",
                         MeasuredValue = 0,
                         State = new SimpleState(),
-                        Mode = EnumMode.Simple
+                        Mode = EnumMode.Simple,
+                        isCounting = true
                     };
             }
+        }
+
+        private static Task OnCount(ISensor sensor)
+        {
+            Count?.Invoke(sensor);
+            return null;
         }
     }
 }

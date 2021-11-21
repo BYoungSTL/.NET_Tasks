@@ -23,7 +23,7 @@ namespace Sensors.ViewModel
         private string _mainTextBlock = "";
         private List<ISensor> _sensors = new List<ISensor>();
         private Guid _id;
-
+        private ISensor _sens;
 
         public EnumMode SensorMode { get; set; }
         public EnumType SensorType
@@ -36,7 +36,7 @@ namespace Sensors.ViewModel
             }
         }
 
-        private ISensor _sens;
+        
         public Guid Id
         {
             get => _id;
@@ -44,6 +44,16 @@ namespace Sensors.ViewModel
             {
                 Sens.Id = value;
                 _id = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public List<ISensor> Sensors
+        {
+            get => _sensors;
+            set
+            {
+                _sensors = value;
                 OnPropertyChanged();
             }
         }
@@ -75,13 +85,15 @@ namespace Sensors.ViewModel
 
         public MainViewModel()
         {
-            _sens = new SensorOptions().Create(SensorType);
+            TaskFactory taskFactory = new TaskFactory();
+            Sens = new SensorOptions().Create(SensorType);
             RefreshCommandProperty = new AsyncCommand<bool>(async () =>
             {
                 MainTextBlock = "";
-                _sensors = await SensorOptions.JsonDeserialize();
-                foreach (var sensor in _sensors)
+                Sensors = SensorOptions.NewstonDeserialize(Sensors);
+                foreach (var sensor in Sensors)
                 {
+                    await taskFactory.StartNew(() => SensorOptions.ValueCounting(sensor)).ConfigureAwait(false);
                     MainTextBlock += "ID: " + sensor.Id.ToString() + "\n";
                     MainTextBlock += "SensorType: " + SensorType + "\n";
                     MainTextBlock += "Measured Name: " + sensor.MeasuredName + "\n";
@@ -93,7 +105,7 @@ namespace Sensors.ViewModel
             });
             CreateCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                await SensorOptions.JsonSerialize(Sens as TemperatureSensor);
+                await SensorOptions.JsonSerialize(Sens);
                 return true;
             });
             DeleteCommandProperty = new AsyncCommand<bool>(async () =>
