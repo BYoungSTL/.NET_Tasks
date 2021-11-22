@@ -63,7 +63,7 @@ namespace Sensors.Model
                 Console.WriteLine(e);
                 throw;
             }
-            return test;
+            return test; // it's null (why not)
         }
 
         public static void NewstonSerialize(List<ISensor> sensors)
