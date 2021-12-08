@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using Sensors.Model.Data.Enums;
 using Sensors.Model.Data.State;
 
@@ -20,6 +22,7 @@ namespace Sensors.Model.Data.Factory.Sensors
 
         public TemperatureSensor()
         {
+            isCounting = false;
             Type = EnumType.Temperature;
             switch (Mode)
             {

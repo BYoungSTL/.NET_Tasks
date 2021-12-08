@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Sensors"
              xmlns:vm="clr-namespace:Sensors.ViewModel"
-             StartupUri="View/MainWindow.xaml">
+             StartupUri="View/Json.xaml">
     <Application.Resources>
          
     </Application.Resources>

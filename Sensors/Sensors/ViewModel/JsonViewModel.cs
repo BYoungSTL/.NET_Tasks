@@ -5,33 +5,45 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Toolkit.Extensions;
 using Microsoft.Toolkit.Helpers;
 using Sensors.Annotations;
 using Sensors.Model;
-using Sensors.Model.Data;
 using Sensors.Model.Data.Enums;
 using Sensors.Model.Data.Factory;
-using Sensors.Model.Data.Factory.Sensors;
+using Sensors.Model.Data.Observer;
+using Sensors.View;
 
 namespace Sensors.ViewModel
 {
-    class MainViewModel : INotifyPropertyChanged
+    class JsonViewModel : INotifyPropertyChanged
     {
-        
+        public static event ValueCountHandler? Count;
         private EnumType _sensorType;
         private string _mainTextBlock = "";
         private List<ISensor> _sensors = new List<ISensor>();
         private Guid _id;
         private ISensor _sens;
-
-        public EnumMode SensorMode { get; set; }
+        private EnumMode _sensorMode;
+        private StringBuilder _scrollViewerText;
+        private static string _message;
+        private readonly SensorObservable _sensorObservable;
+        public EnumMode SensorMode
+        {
+            get => _sensorMode;
+            set
+            {
+                _sensorMode = value;
+                _sens.Mode = value;
+                OnPropertyChanged();
+            }
+        }
         public EnumType SensorType
         {
             get => _sensorType;
             set
             {
                 _sensorType = value;
+                _sens.Type = value;
                 OnPropertyChanged();
             }
         }
@@ -66,7 +78,15 @@ namespace Sensors.ViewModel
                 _mainTextBlock = value;
                 OnPropertyChanged();
             }
-
+        }
+        public StringBuilder ScrollViewerText
+        {
+            get => _scrollViewerText;
+            set
+            {
+                _scrollViewerText = value;
+                OnPropertyChanged();
+            }
         }
         public ISensor Sens
         {
@@ -83,52 +103,105 @@ namespace Sensors.ViewModel
         public IAsyncCommand FindCommandProperty { get; set; }
         public IAsyncCommand RefreshCommandProperty { get; set; }
 
-        public MainViewModel()
+        public IAsyncCommand StartCommandProperty { get; set; }
+
+        public IAsyncCommand CleanLogCommandProperty { get; set; }
+
+        public IAsyncCommand XMLCommandProperty { get; set; }
+
+        public JsonViewModel()
         {
+            ScrollViewerText = new StringBuilder();
+            _sensorObservable = new SensorObservable();
+            Count += SensorOptions.StopCount;
             TaskFactory taskFactory = new TaskFactory();
             Sens = new SensorOptions().Create(SensorType);
+            SensorObserver observer = new SensorObserver
+            {
+                LastProvider = new SensorMonitor
+                {
+                    SensorCount = Sensors.Count
+                }
+            };
+            XMLCommandProperty = new AsyncCommand<bool>(async () =>
+            {
+                new Xml().Show();
+                return true;
+            });
+            CleanLogCommandProperty = new AsyncCommand<bool>(async () =>
+            {
+                ScrollViewerText = new StringBuilder("");
+                return true;
+            });
             RefreshCommandProperty = new AsyncCommand<bool>(async () =>
             {
+                Count.Invoke();
+                if (!string.IsNullOrEmpty(_message))
+                {
+                    ScrollViewerText = ScrollViewerText.Append(_message);
+                }
                 MainTextBlock = "";
-                Sensors = SensorOptions.NewstonDeserialize(Sensors);
+                Sensors = await SensorOptions.JsonDeserializeAsync();
+                observer.LastProvider = new SensorMonitor
+                {
+                    SensorCount = Sensors.Count
+                };
                 foreach (var sensor in Sensors)
                 {
-                    await taskFactory.StartNew(() => SensorOptions.ValueCounting(sensor)).ConfigureAwait(false);
-                    MainTextBlock += "ID: " + sensor.Id.ToString() + "\n";
-                    MainTextBlock += "SensorType: " + SensorType + "\n";
-                    MainTextBlock += "Measured Name: " + sensor.MeasuredName + "\n";
-                    MainTextBlock += "Measured Value: " + sensor.MeasuredValue + "\n";
-                    MainTextBlock += "Interval: " + sensor.Interval.ToString() + "\n";
-                    MainTextBlock += "Mode: " + Enum.GetName(sensor.Mode) + "\n" + "\n";
+                    MainTextBlockInit(sensor);
                 }
                 return true;
             });
             CreateCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                await SensorOptions.JsonSerialize(Sens);
+                observer.Subscribe(_sensorObservable);
+                await SensorOptions.JsonSerializeAsync(Sens);
+                await _sensorObservable.NotifyAsync(false);
                 return true;
             });
             DeleteCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                await SensorOptions.JsonDelete(Id);
+                await SensorOptions.DeleteAsync(Id, true);
+                await _sensorObservable.NotifyAsync(false);
+                var startCommandProperty = StartCommandProperty;
                 return true;
             });
             ChangeCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                await SensorOptions.JsonChange(Id, Sens as TemperatureSensor);
+                await SensorOptions.ChangeAsync(Id, Sens, true);
+                var startCommandProperty = StartCommandProperty;
                 return true;
             });
             FindCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                ISensor findSensor = await SensorOptions.JsonFind(Id);
+                ISensor findSensor = await SensorOptions.FindAsync(Id, true);
                 if (findSensor == null)
                 {
                     return false;
                 }
 
+                MainTextBlock = "";
+                MainTextBlockInit(findSensor);
+
                 Sens = findSensor;
                 return true;
             });
+            StartCommandProperty = new AsyncCommand<bool>(async () =>
+            {
+                List<Task> tasks = new List<Task>();
+                if (Sensors.Count == 0)
+                {
+                    return false;
+                }
+                tasks.Add(taskFactory.StartNew(async () => await SensorOptions.ValueCountingAsync(Sensors)));
+                await Task.WhenAny(tasks);
+                return true;
+            });
+        }
+
+        public static void GetMessage(string message)
+        {
+            _message = message;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -137,6 +210,16 @@ namespace Sensors.ViewModel
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null!)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void MainTextBlockInit(ISensor sensor)
+        {
+            MainTextBlock += "ID: " + sensor.Id.ToString() + "\n";
+            MainTextBlock += "SensorType: " + SensorType + "\n";
+            MainTextBlock += "Measured Name: " + sensor.MeasuredName + "\n";
+            MainTextBlock += "Measured Value: " + sensor.MeasuredValue + "\n";
+            MainTextBlock += "Interval: " + sensor.Interval.ToString() + "\n";
+            MainTextBlock += "Mode: " + Enum.GetName(sensor.Mode) + "\n" + "\n";
         }
     }
 

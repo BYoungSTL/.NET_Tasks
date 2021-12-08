@@ -4,6 +4,7 @@ namespace Sensors.Model.Data.State
 {
     public class SimpleState : ISensorState
     {
+        //current state
         public void StateSimple(ISensor sensor)
         {
             

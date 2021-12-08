@@ -18,6 +18,7 @@ namespace Sensors.Model.Data.Factory.Sensors
 
         public PressureSensor()
         {
+            isCounting = false;
             Type = EnumType.Pressure;
             switch (Mode)
             {

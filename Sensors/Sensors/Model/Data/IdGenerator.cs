@@ -15,6 +15,5 @@ namespace Sensors.Model.Data
         {
             return Guid.NewGuid();
         }
-
     }
 }

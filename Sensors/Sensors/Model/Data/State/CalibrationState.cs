@@ -11,6 +11,7 @@ namespace Sensors.Model.Data.State
             sensor.State = new SimpleState();
         }
 
+        //current state
         public void StateCalibration(ISensor sensor)
         {
             

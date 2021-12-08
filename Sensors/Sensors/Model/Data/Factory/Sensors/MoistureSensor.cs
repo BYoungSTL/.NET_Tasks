@@ -19,6 +19,7 @@ namespace Sensors.Model.Data.Factory.Sensors
 
         public MoistureSensor()
         {
+            isCounting = false;
             Type = EnumType.Moisture;
             switch (Mode)
             {
@@ -33,5 +34,6 @@ namespace Sensors.Model.Data.Factory.Sensors
                     break;
             }
         }
+
     }
 }
