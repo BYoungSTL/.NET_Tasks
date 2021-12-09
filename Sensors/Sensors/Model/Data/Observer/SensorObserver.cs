@@ -11,11 +11,9 @@ namespace Sensors.Model.Data.Observer
         private const string OnCompletedMessage = "Data will not be transmitted";
         private IDisposable _unsubscriber;
         public SensorMonitor LastProvider { get; set; }
-
         public int PrevCount { get; set; }
 
-
-        public virtual void Subscribe(IObservable<SensorMonitor> provider)
+        public virtual void Subscribe(SensorObservable provider)
         {
             _unsubscriber = provider.Subscribe(this);
         }
@@ -59,23 +57,31 @@ namespace Sensors.Model.Data.Observer
             {
                 SensorCount = sensors.Count
             };
-            foreach (var sensor in sensors)
+            SensorObservable observable = new SensorObservable();
+            try
             {
-                if (sensor != null)
+                foreach (var sensor in sensors)
                 {
-                    if (PrevCount != sensors.Count)
+                    if (sensor != null)
                     {
-                        provider.SensorCount = sensors.Count;
-                        OnNext(provider);
-                        PrevCount = sensors.Count;
+                        if (PrevCount != sensors.Count)
+                        {
+                            provider.SensorCount = sensors.Count;
+                            OnNext(provider);
+                            PrevCount = sensors.Count;
+                        }
+                    }
+                    else
+                    {
+                        Unsubscribe();
+                        OnCompleted();
+                        break;
                     }
                 }
-                else
-                {
-                    Unsubscribe();
-                    OnCompleted();
-                    break;
-                }
+            }
+            catch (Exception e)
+            {
+                OnError(e);
             }
         }
     }

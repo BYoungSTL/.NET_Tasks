@@ -73,7 +73,7 @@
                       HorizontalAlignment="Left" Margin="222,17,0,0" Grid.Row="5" VerticalAlignment="Top" Height ="26" Width="166"
                       IsReadOnly="True">
             </ComboBox>
-            <Button Command="{Binding XMLCommandProperty}" Content="XML" Grid.Column="0" Margin="10,9,290,19" Grid.Row="6" />
+            <Button Command="{Binding XmlCommandProperty}" Content="XML" Grid.Column="0" Margin="10,9,290,19" Grid.Row="6" />
 
         </Grid>
         <Grid Grid.Column="1" Margin="0,0,24,0">

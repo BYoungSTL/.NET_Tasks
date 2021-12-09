@@ -15,7 +15,7 @@ namespace Sensors.ViewModel
 {
     class XmlViewModel : INotifyPropertyChanged
     {
-        public static event ValueCountHandler Count;
+        public static event ValueCountHandler? Count;
         private EnumType _sensorType;
         private string _mainTextBlock = "";
         private List<ISensor> _sensors = new List<ISensor>();
@@ -23,9 +23,11 @@ namespace Sensors.ViewModel
         private ISensor _sens;
         private EnumMode _sensorMode;
         private StringBuilder _scrollViewerText;
-        private static string _message;
-        private readonly SensorObservable _sensorObservable;
+        private static string? _message;
 
+        /// <summary>
+        /// Properties bindings elements of windows and logic
+        /// </summary>
         public EnumMode SensorMode
         {
             get => _sensorMode;
@@ -99,7 +101,9 @@ namespace Sensors.ViewModel
                 OnPropertyChanged();
             }
         }
-
+        /// <summary>
+        /// IAsyncCommand bindings buttons and functions
+        /// </summary>
         public IAsyncCommand CreateCommandProperty { get; set; }
         public IAsyncCommand DeleteCommandProperty { get; set; }
         public IAsyncCommand ChangeCommandProperty { get; set; }
@@ -113,14 +117,16 @@ namespace Sensors.ViewModel
         public XmlViewModel()
         {
             ScrollViewerText = new StringBuilder();
-            _sensorObservable = new SensorObservable();
+            SensorObservable sensorObservable = new SensorObservable();
             Count += SensorOptions.StopCount;
             TaskFactory taskFactory = new TaskFactory();
             Sens = new SensorOptions().Create(SensorType);
-            SensorObserver observer = new SensorObserver();
-            observer.LastProvider = new SensorMonitor
+            SensorObserver observer = new SensorObserver
             {
-                SensorCount = Sensors.Count
+                LastProvider = new SensorMonitor
+                {
+                    SensorCount = Sensors.Count
+                }
             };
             CleanLogCommandProperty = new AsyncCommand<bool>(async () =>
             {
@@ -148,15 +154,16 @@ namespace Sensors.ViewModel
             });
             CreateCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                observer.Subscribe(_sensorObservable);
+                observer.Subscribe(sensorObservable);
+                //sensorObservable.Subscribe(observer);
                 await SensorOptions.XmlSerializeAsync(Sens);
-                await _sensorObservable.NotifyAsync(true);
+                await sensorObservable.NotifyAsync(true);
                 return true;
             });
             DeleteCommandProperty = new AsyncCommand<bool>(async () =>
             {
                 await SensorOptions.DeleteAsync(Id, true);
-                await _sensorObservable.NotifyAsync(true);
+                await sensorObservable.NotifyAsync(true);
                 var startCommandProperty = StartCommandProperty;
                 return true;
             });
@@ -193,7 +200,7 @@ namespace Sensors.ViewModel
             });
         }
 
-        public static void GetMessage(string message)
+        public static void GetMessage(string? message)
         {
             _message = message;
         }

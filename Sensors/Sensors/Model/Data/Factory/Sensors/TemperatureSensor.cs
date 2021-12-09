@@ -11,18 +11,18 @@ namespace Sensors.Model.Data.Factory.Sensors
     [Serializable, DataContract]
     public class TemperatureSensor : ISensor
     {
-        [JsonIgnore] public ISensorState State { get; set; }
+        public ISensorState State { get; set; }
         public EnumType Type { get; set; }
         public Guid Id { get; set; }
         public string MeasuredName { get; set; }
         public int MeasuredValue{ get; set; }
         public int Interval { get; set; } 
         public EnumMode Mode { get; set; }
-        public bool isCounting { get; set; }
+        public bool IsCounting { get; set; }
 
         public TemperatureSensor()
         {
-            isCounting = false;
+            IsCounting = false;
             Type = EnumType.Temperature;
             switch (Mode)
             {

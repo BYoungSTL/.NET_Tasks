@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using Newtonsoft.Json;
 using Sensors.Model.Data;
 using Sensors.Model.Data.Enums;
 using Sensors.Model.Data.Factory;
@@ -19,8 +19,9 @@ namespace Sensors.Model
         public static bool IsContinue;
         public static event ValueCountHandler Count;
 
-        public static readonly string JsonPath = Directory.GetCurrentDirectory() + "\\sensorsSpecification.json";
-        public static readonly string XmlPath = Directory.GetCurrentDirectory() + "\\sensorsSpecification.xml";
+        private static readonly string JsonPath = Directory.GetCurrentDirectory() + "\\sensorsSpecification.json";
+        private static readonly string XmlPath = Directory.GetCurrentDirectory() + "\\sensorsSpecification.xml";
+       
         public static async Task<List<ISensor>> JsonDeserializeAsync()
         {
             ExistingFile(JsonPath);
@@ -28,27 +29,58 @@ namespace Sensors.Model
             {
                 return null;
             }
-            List<SensorSerialize> sensorsSerialize = new List<SensorSerialize>();
-            await Task.Run(() =>
+
+            await using FileStream fs = new FileStream(JsonPath, FileMode.OpenOrCreate);
+            List<SensorSerialize> sensorsSerialize = await JsonSerializer.DeserializeAsync<List<SensorSerialize>>(fs, new JsonSerializerOptions
             {
-                sensorsSerialize = JsonConvert.DeserializeObject<List<SensorSerialize>>(File.ReadAllText(JsonPath),
-                    new JsonSerializerSettings
-                    {
-                        TypeNameHandling = TypeNameHandling.All
-                    });
+                WriteIndented = true
             });
             List<ISensor> sensors = new List<ISensor>();
-            foreach (var sensor in sensorsSerialize)
-            {
-                ISensor sens = new SensorOptions().Create(sensor.Type);
-                sens.Id = sensor.Id;
-                sens.MeasuredValue = sensor.MeasuredValue;
-                sens.Mode = sensor.Mode;
-                sens.Interval = sensor.Interval;
-                sens.MeasuredName = sensor.MeasuredName;
-                sensors.Add(sens);
-            }
+            if (sensorsSerialize != null)
+                foreach (var sensor in sensorsSerialize)
+                {
+                    ISensor sens = new SensorOptions().Create(sensor.Type);
+                    sens.Id = sensor.Id;
+                    sens.MeasuredValue = sensor.MeasuredValue;
+                    sens.Mode = sensor.Mode;
+                    sens.Interval = sensor.Interval;
+                    sens.MeasuredName = sensor.MeasuredName;
+                    sensors.Add(sens);
+                }
+
             return sensors;
+        }
+
+        public static async Task JsonSerializeAsync(ISensor sensor)
+        {
+            Count?.Invoke();
+            ExistingFile(JsonPath);
+            sensor.Id = IdGenerator.Generate();
+            List<SensorSerialize> sensorsSerialize = new List<SensorSerialize>();
+            List<ISensor> sensors = new List<ISensor>();
+            if (new FileInfo(JsonPath).Length != 0)
+            {
+                sensors = await JsonDeserializeAsync();
+            }
+            sensors ??= new List<ISensor>();
+            sensors.Add(sensor);
+            foreach (var sens in sensors)
+            {
+                sensorsSerialize.Add(new SensorSerialize
+                {
+                    Id = sens.Id,
+                    Interval = sens.Interval,
+                    MeasuredValue = sens.MeasuredValue,
+                    MeasuredName = sens.MeasuredName,
+                    Type = sens.Type
+                });
+            }
+
+            await using FileStream fs = new FileStream(JsonPath, FileMode.OpenOrCreate);
+            await JsonSerializer.SerializeAsync(fs, sensorsSerialize, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
         }
 
         public static async Task<List<ISensor>> XmlDeserializeAsync()
@@ -95,7 +127,7 @@ namespace Sensors.Model
             sensors.Add(sensor);
             foreach (var sens in sensors)
             {
-                xmlSensors.Add(new SensorSerialize()
+                xmlSensors.Add(new SensorSerialize
                 {
                     Id = sens.Id,
                     Interval = sens.Interval,
@@ -104,61 +136,11 @@ namespace Sensors.Model
                     Type = sens.Type
                 });
             }
-            try
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(List<SensorSerialize>));
-                await using FileStream fileStream = new FileStream(XmlPath, FileMode.OpenOrCreate);
-                serializer.Serialize(fileStream, xmlSensors);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-
-        public static async Task JsonSerializeAsync(ISensor sensor)
-        {
-            Count?.Invoke();
-            ExistingFile(JsonPath);
-            sensor.Id = IdGenerator.Generate();
-            List<SensorSerialize> sensorsSerialize = new List<SensorSerialize>();
-            List<ISensor> sensors = new List<ISensor>();
-            if (new FileInfo(JsonPath).Length != 0)
-            {
-                sensors = await JsonDeserializeAsync();
-            }
-            sensors ??= new List<ISensor>();
-            sensors.Add(sensor);
-            foreach (var sens in sensors)
-            {
-                sensorsSerialize.Add(new SensorSerialize
-                {
-                    Id = sens.Id,
-                    Interval = sens.Interval,
-                    MeasuredValue = sens.MeasuredValue,
-                    MeasuredName = sens.MeasuredName,
-                    Type = sens.Type
-                });
-            }
-            string str = null;
-            await Task.Run(() =>
-            {
-                str = JsonConvert.SerializeObject(sensorsSerialize, new JsonSerializerSettings()
-                {
-                    TypeNameHandling = TypeNameHandling.All
-                });
-            });
-            
-            try
-            {
-                await File.WriteAllTextAsync(JsonPath, str);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+           
+            XmlSerializer serializer = new XmlSerializer(typeof(List<SensorSerialize>));
+            await using FileStream fileStream = new FileStream(XmlPath, FileMode.OpenOrCreate);
+            serializer.Serialize(fileStream, xmlSensors);
+                
         }
 
         private static void ExistingFile(string path)
@@ -242,8 +224,12 @@ namespace Sensors.Model
             }
             return true;
         }
-
-        //IsContinue = false, maybe serialize calls StopCount
+        /// <summary>
+        /// Counting the value of each sensor
+        /// Calls by "Start" button
+        /// </summary>
+        /// <param name="sensors"></param>
+        /// <returns></returns>
         public static async Task ValueCountingAsync(List<ISensor> sensors)
         {
             Thread.CurrentThread.Name = "Value Count";
@@ -251,7 +237,7 @@ namespace Sensors.Model
             IsContinue = true;
             foreach (var sensor in sensors)
             {
-                sensor.isCounting = true;
+                sensor.IsCounting = true;
             }
             while (IsContinue)
             {
@@ -262,26 +248,26 @@ namespace Sensors.Model
                         case EnumMode.Calibration:
                             sensor.MeasuredValue += 1;
                             await Task.Delay(sensor.Interval = 1000);
+                            sensor.Mode = EnumMode.Work;
                             break;
                         case EnumMode.Work:
                             sensor.MeasuredValue = new Random().Next(151);
                             await Task.Delay(sensor.Interval);
+                            sensor.Mode = EnumMode.Simple;
                             break;
                         case EnumMode.Simple:
-                            sensor.MeasuredValue = 0;
-                            sensor.Interval = 0;
+                            sensor.Mode = EnumMode.Calibration;
                             break;
                     }
                 }
             }
 
-            File.Delete(SensorOptions.JsonPath);
+            File.Delete(JsonPath);
             foreach (var sensor in sensors)
             {
-                sensor.isCounting = false;
+                sensor.IsCounting = false;
                 await JsonSerializeAsync(sensor);
             }
-            //await ChangeAsync(sensor.Id, sensor, false); // don't use ChangeAsync
         }
 
         public static async Task<ISensor> FindAsync(Guid id, bool isXml)
@@ -317,7 +303,7 @@ namespace Sensors.Model
                         MeasuredValue = 0,
                         State = new SimpleState(),
                         Mode = EnumMode.Simple,
-                        isCounting = false
+                        IsCounting = false
                     };
                 case EnumType.Pressure:
                     return new PressureSensor
@@ -327,7 +313,7 @@ namespace Sensors.Model
                         MeasuredValue = 0,
                         State = new SimpleState(),
                         Mode = EnumMode.Simple,
-                        isCounting = false
+                        IsCounting = false
                     };
                 default:
                     return new TemperatureSensor
@@ -337,7 +323,7 @@ namespace Sensors.Model
                         MeasuredValue = 0,
                         State = new SimpleState(),
                         Mode = EnumMode.Simple,
-                        isCounting = false
+                        IsCounting = false
                     };
             }
         }

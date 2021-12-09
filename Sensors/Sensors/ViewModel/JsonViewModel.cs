@@ -25,8 +25,11 @@ namespace Sensors.ViewModel
         private ISensor _sens;
         private EnumMode _sensorMode;
         private StringBuilder _scrollViewerText;
-        private static string _message;
-        private readonly SensorObservable _sensorObservable;
+        private static string? _message;
+
+        /// <summary>
+        /// Properties bindings elements of windows and logic
+        /// </summary>
         public EnumMode SensorMode
         {
             get => _sensorMode;
@@ -79,6 +82,9 @@ namespace Sensors.ViewModel
                 OnPropertyChanged();
             }
         }
+        /// <summary>
+        /// Receives notifications by observers
+        /// </summary>
         public StringBuilder ScrollViewerText
         {
             get => _scrollViewerText;
@@ -97,22 +103,27 @@ namespace Sensors.ViewModel
                 OnPropertyChanged();
             }
         }
+        /// <summary>
+        /// IAsyncCommand bindings buttons and functions
+        /// </summary>
         public IAsyncCommand CreateCommandProperty { get; set; }
         public IAsyncCommand DeleteCommandProperty { get; set; }
         public IAsyncCommand ChangeCommandProperty { get; set; }
         public IAsyncCommand FindCommandProperty { get; set; }
         public IAsyncCommand RefreshCommandProperty { get; set; }
-
+        /// <summary>
+        /// Counting the value of each sensor
+        /// </summary>
         public IAsyncCommand StartCommandProperty { get; set; }
 
         public IAsyncCommand CleanLogCommandProperty { get; set; }
 
-        public IAsyncCommand XMLCommandProperty { get; set; }
+        public IAsyncCommand XmlCommandProperty { get; set; }
 
         public JsonViewModel()
         {
             ScrollViewerText = new StringBuilder();
-            _sensorObservable = new SensorObservable();
+            SensorObservable sensorObservable = new SensorObservable();
             Count += SensorOptions.StopCount;
             TaskFactory taskFactory = new TaskFactory();
             Sens = new SensorOptions().Create(SensorType);
@@ -123,7 +134,7 @@ namespace Sensors.ViewModel
                     SensorCount = Sensors.Count
                 }
             };
-            XMLCommandProperty = new AsyncCommand<bool>(async () =>
+            XmlCommandProperty = new AsyncCommand<bool>(async () =>
             {
                 new Xml().Show();
                 return true;
@@ -154,22 +165,21 @@ namespace Sensors.ViewModel
             });
             CreateCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                observer.Subscribe(_sensorObservable);
+                observer.Subscribe(sensorObservable);
+                //var unsubscribe = sensorObservable.Subscribe(observer);
                 await SensorOptions.JsonSerializeAsync(Sens);
-                await _sensorObservable.NotifyAsync(false);
+                await sensorObservable.NotifyAsync(false);
                 return true;
             });
             DeleteCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                await SensorOptions.DeleteAsync(Id, true);
-                await _sensorObservable.NotifyAsync(false);
-                var startCommandProperty = StartCommandProperty;
+                await SensorOptions.DeleteAsync(Id, false);
+                await sensorObservable.NotifyAsync(false);
                 return true;
             });
             ChangeCommandProperty = new AsyncCommand<bool>(async () =>
             {
                 await SensorOptions.ChangeAsync(Id, Sens, true);
-                var startCommandProperty = StartCommandProperty;
                 return true;
             });
             FindCommandProperty = new AsyncCommand<bool>(async () =>
@@ -199,7 +209,11 @@ namespace Sensors.ViewModel
             });
         }
 
-        public static void GetMessage(string message)
+        /// <summary>
+        /// Get Message by Observer
+        /// </summary>
+        /// <param name="message"></param>
+        public static void GetMessage(string? message)
         {
             _message = message;
         }
@@ -212,6 +226,12 @@ namespace Sensors.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+
+        /// <summary>
+        /// Initialization the text block with info about sensors
+        /// calls by Refresh button
+        /// </summary>
+        /// <param name="sensor"></param>
         private void MainTextBlockInit(ISensor sensor)
         {
             MainTextBlock += "ID: " + sensor.Id.ToString() + "\n";
@@ -223,34 +243,4 @@ namespace Sensors.ViewModel
         }
     }
 
-    class AsyncCommand<TResult> : IAsyncCommand, INotifyPropertyChanged
-    {
-        private readonly Func<Task<TResult>> _command;
-        private NotifyTaskCompletion<TResult> _execution;
-
-        public AsyncCommand(Func<Task<TResult>>? command)
-        {
-            _command = command;
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            _command();
-        }
-
-        public Task ExecuteAsync(object parameter)
-        {
-            return new NotifyTaskCompletion<TResult>(_command()).TaskCompletion;
-        }
-
-        public event EventHandler? CanExecuteChanged;
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        public NotifyTaskCompletion<TResult> Execution;
-    }
 }
