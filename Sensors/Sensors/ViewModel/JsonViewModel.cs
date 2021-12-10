@@ -162,7 +162,7 @@ namespace Sensors.ViewModel
             });
             ChangeCommandProperty = new AsyncCommand<bool>(async () =>
             {
-                await SensorOptions.ChangeAsync(Id, Sens, true);
+                await SensorOptions.ChangeAsync(Id, Sens, false);
                 return true;
             });
             FindCommandProperty = new AsyncCommand<bool>(async () =>

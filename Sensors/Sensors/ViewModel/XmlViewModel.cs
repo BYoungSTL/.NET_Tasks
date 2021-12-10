@@ -155,7 +155,6 @@ namespace Sensors.ViewModel
             CreateCommandProperty = new AsyncCommand<bool>(async () =>
             {
                 observer.Subscribe(sensorObservable);
-                //sensorObservable.Subscribe(observer);
                 await SensorOptions.XmlSerializeAsync(Sens);
                 await sensorObservable.NotifyAsync(true);
                 return true;

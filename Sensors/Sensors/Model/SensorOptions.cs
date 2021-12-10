@@ -247,7 +247,6 @@ namespace Sensors.Model
         /// <returns></returns>
         public static async Task ValueCountingAsync(List<ISensor> sensors)
         {
-            Thread.CurrentThread.Name = "Value Count";
             Count += StopCount;
             IsContinue = true;
             foreach (var sensor in sensors)
