@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Toolkit.Helpers;
 using Sensors.Annotations;
 using Sensors.Model;
 using Sensors.Model.Data.Enums;
@@ -23,30 +22,18 @@ namespace Sensors.ViewModel
         private List<ISensor> _sensors = new List<ISensor>();
         private Guid _id;
         private ISensor _sens;
-        private EnumMode _sensorMode;
         private StringBuilder _scrollViewerText;
         private static string? _message;
 
         /// <summary>
         /// Properties bindings elements of windows and logic
         /// </summary>
-        public EnumMode SensorMode
-        {
-            get => _sensorMode;
-            set
-            {
-                _sensorMode = value;
-                _sens.Mode = value;
-                OnPropertyChanged();
-            }
-        }
         public EnumType SensorType
         {
             get => _sensorType;
             set
             {
                 _sensorType = value;
-                _sens.Type = value;
                 OnPropertyChanged();
             }
         }
@@ -57,7 +44,6 @@ namespace Sensors.ViewModel
             get => _id;
             set
             {
-                Sens.Id = value;
                 _id = value;
                 OnPropertyChanged();
             }
@@ -115,9 +101,7 @@ namespace Sensors.ViewModel
         /// Counting the value of each sensor
         /// </summary>
         public IAsyncCommand StartCommandProperty { get; set; }
-
         public IAsyncCommand CleanLogCommandProperty { get; set; }
-
         public IAsyncCommand XmlCommandProperty { get; set; }
 
         public JsonViewModel()
@@ -166,7 +150,6 @@ namespace Sensors.ViewModel
             CreateCommandProperty = new AsyncCommand<bool>(async () =>
             {
                 observer.Subscribe(sensorObservable);
-                //var unsubscribe = sensorObservable.Subscribe(observer);
                 await SensorOptions.JsonSerializeAsync(Sens);
                 await sensorObservable.NotifyAsync(false);
                 return true;

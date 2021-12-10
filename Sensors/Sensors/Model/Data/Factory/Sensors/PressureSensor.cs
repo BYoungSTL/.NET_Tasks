@@ -23,13 +23,13 @@ namespace Sensors.Model.Data.Factory.Sensors
             switch (Mode)
             {
                 case EnumMode.Simple:
-                    State = new SimpleState();
+                    State = new SimpleState(this);
                     break;
                 case EnumMode.Calibration:
-                    State = new CalibrationState();
+                    State = new CalibrationState(this);
                     break;
                 case EnumMode.Work:
-                    State = new WorkState();
+                    State = new WorkState(this);
                     break;
             }
         }

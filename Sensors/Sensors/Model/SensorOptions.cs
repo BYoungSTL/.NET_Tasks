@@ -72,7 +72,8 @@ namespace Sensors.Model
                     Interval = sens.Interval,
                     MeasuredValue = sens.MeasuredValue,
                     MeasuredName = sens.MeasuredName,
-                    Type = sens.Type
+                    Type = sens.Type,
+                    Mode = sens.Mode
                 });
             }
 
@@ -267,6 +268,23 @@ namespace Sensors.Model
             {
                 sensor.IsCounting = false;
                 await JsonSerializeAsync(sensor);
+                ChangeState(sensor);
+            }
+        }
+
+        public static void ChangeState(ISensor sensor)
+        {
+            switch (sensor.State)
+            {
+                case SimpleState:
+                    sensor.State.StateCalibration();
+                    break;
+                case CalibrationState:
+                    sensor.State.StateWork();
+                    break;
+                case WorkState:
+                    sensor.State.StateSimple();
+                    break;
             }
         }
 
@@ -301,7 +319,6 @@ namespace Sensors.Model
                         Id = IdGenerator.Generate(),
                         MeasuredName = "Moisture",
                         MeasuredValue = 0,
-                        State = new SimpleState(),
                         Mode = EnumMode.Simple,
                         IsCounting = false
                     };
@@ -311,7 +328,6 @@ namespace Sensors.Model
                         Id = IdGenerator.Generate(),
                         MeasuredName = "Pressure",
                         MeasuredValue = 0,
-                        State = new SimpleState(),
                         Mode = EnumMode.Simple,
                         IsCounting = false
                     };
@@ -321,7 +337,6 @@ namespace Sensors.Model
                         Id = IdGenerator.Generate(),
                         MeasuredName = "Temperature",
                         MeasuredValue = 0,
-                        State = new SimpleState(),
                         Mode = EnumMode.Simple,
                         IsCounting = false
                     };

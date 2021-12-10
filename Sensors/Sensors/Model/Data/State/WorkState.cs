@@ -1,24 +1,32 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Sensors.Model.Data.Enums;
 using Sensors.Model.Data.Factory;
 
 namespace Sensors.Model.Data.State
 {
     public class WorkState : ISensorState
     {
-        public void StateSimple(ISensor sensor)
+        private readonly ISensor _sensor;
+        public WorkState(ISensor sensor)
         {
-            sensor.State = new SimpleState();
+            _sensor = sensor;
+        }
+        public void StateSimple()
+        {
+            _sensor.MeasuredValue = 0;
+            _sensor.Mode = EnumMode.Simple;
+            _sensor.State = new SimpleState(_sensor);
         }
 
-        public void StateCalibration(ISensor sensor)
+        public void StateCalibration()
         {
-            sensor.State = new CalibrationState();
+            _sensor.MeasuredValue = 0;
+            _sensor.Interval = 0;
+            _sensor.Mode = EnumMode.Calibration;
+            _sensor.State = new CalibrationState(_sensor);
         }
 
         //current state
-        public void StateWork(ISensor sensor)
+        public void StateWork()
         {
             
         }
