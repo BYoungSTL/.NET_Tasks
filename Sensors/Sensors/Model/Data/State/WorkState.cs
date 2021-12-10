@@ -28,7 +28,7 @@ namespace Sensors.Model.Data.State
         //current state
         public void StateWork()
         {
-            
+            _sensor.MeasuredValue = 0;
         }
     }
 }

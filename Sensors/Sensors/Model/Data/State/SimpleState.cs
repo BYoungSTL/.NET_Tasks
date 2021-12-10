@@ -13,7 +13,7 @@ namespace Sensors.Model.Data.State
         //current state
         public void StateSimple()
         {
-            
+            _sensor.MeasuredValue = 0;
         }
 
         public void StateCalibration()

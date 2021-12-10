@@ -134,7 +134,8 @@ namespace Sensors.Model
                     Interval = sens.Interval,
                     MeasuredValue = sens.MeasuredValue,
                     MeasuredName = sens.MeasuredName,
-                    Type = sens.Type
+                    Type = sens.Type,
+                    Mode = sens.Mode
                 });
             }
            
@@ -204,9 +205,22 @@ namespace Sensors.Model
             {
                 if (sens.Id == id)
                 {
+                    sens.Interval = sensor.Interval;
+                    sens.Type = sensor.Type;
                     sens.MeasuredName = sensor.MeasuredName;
                     sens.MeasuredValue = sensor.MeasuredValue;
-                    sens.Mode = sensor.Mode;
+                    switch (sensor.State)
+                    {
+                        case CalibrationState:
+                            sens.State.StateCalibration();
+                            break;
+                        case WorkState:
+                            sens.State.StateWork();
+                            break;
+                        default:
+                            sens.State.StateSimple();
+                            break;
+                    }
                     File.Delete(isXml ? XmlPath : JsonPath);
                 }
 
